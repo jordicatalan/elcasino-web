@@ -59,6 +59,16 @@
             "precio_va": "",
             "precio_en": ""
           }
+        },
+        {
+          "precio": "50,00 €",
+          "traducciones": {
+            "nombre_va": "",
+            "nombre_en": "",
+            "precio_va": "",
+            "precio_en": ""
+          },
+          "nombre": "Prueba"
         }
       ]
     },
@@ -287,6 +297,28 @@
             "precio_va": "",
             "precio_en": ""
           }
+        }
+      ]
+    },
+    {
+      "nota": "",
+      "traducciones": {
+        "nombre_va": "",
+        "nombre_en": "",
+        "nota_va": "",
+        "nota_en": ""
+      },
+      "nombre": "Prueba categoría",
+      "platos": [
+        {
+          "precio": "11,00 €",
+          "traducciones": {
+            "nombre_va": "",
+            "nombre_en": "",
+            "precio_va": "",
+            "precio_en": ""
+          },
+          "nombre": "Prueba Plato categoría"
         }
       ]
     }
