@@ -1,6 +1,28 @@
 {
   "categorias": [
     {
+      "nota": "",
+      "traducciones": {
+        "nombre_va": "",
+        "nombre_en": "",
+        "nota_va": "",
+        "nota_en": ""
+      },
+      "nombre": "Prueba categoría",
+      "platos": [
+        {
+          "precio": "11,00 €",
+          "traducciones": {
+            "nombre_va": "",
+            "nombre_en": "",
+            "precio_va": "",
+            "precio_en": ""
+          },
+          "nombre": "Prueba Plato categoría"
+        }
+      ]
+    },
+    {
       "nombre": "Desayunos & almuerzos",
       "nota": "",
       "traducciones": {
@@ -297,28 +319,6 @@
             "precio_va": "",
             "precio_en": ""
           }
-        }
-      ]
-    },
-    {
-      "nota": "",
-      "traducciones": {
-        "nombre_va": "",
-        "nombre_en": "",
-        "nota_va": "",
-        "nota_en": ""
-      },
-      "nombre": "Prueba categoría",
-      "platos": [
-        {
-          "precio": "11,00 €",
-          "traducciones": {
-            "nombre_va": "",
-            "nombre_en": "",
-            "precio_va": "",
-            "precio_en": ""
-          },
-          "nombre": "Prueba Plato categoría"
         }
       ]
     }
