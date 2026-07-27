@@ -3,7 +3,12 @@
     {
       "nombre": "Desayunos & almuerzos",
       "nota": "",
-      "traducciones": { "nombre_va": "Esmorzars", "nombre_en": "Breakfast & brunch", "nota_va": "", "nota_en": "" },
+      "traducciones": {
+        "nombre_va": "Esmorzars",
+        "nombre_en": "Breakfast & brunch",
+        "nota_va": "",
+        "nota_en": ""
+      },
       "platos": [
         {
           "nombre": "Tostada de pan de pueblo con tomate y AOVE",
@@ -11,7 +16,8 @@
           "traducciones": {
             "nombre_va": "Torrada de pa de poble amb tomaca i oli d'oliva verge",
             "nombre_en": "Rustic bread toast with tomato and extra-virgin olive oil",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -20,7 +26,8 @@
           "traducciones": {
             "nombre_va": "Torrada d'alvocat, ou poché i llavors",
             "nombre_en": "Avocado toast with poached egg and seeds",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -29,7 +36,8 @@
           "traducciones": {
             "nombre_va": "Brioix de la casa amb crema de cacau, plàtan i maduixes",
             "nombre_en": "House brioche with chocolate cream, banana and strawberries",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -38,7 +46,8 @@
           "traducciones": {
             "nombre_va": "Croissant artesà amb café amb llet",
             "nombre_en": "Artisan croissant with a café con leche",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -47,7 +56,8 @@
           "traducciones": {
             "nombre_va": "Esmorzar «El Casino»: entrepà, beguda i café",
             "nombre_en": "«El Casino» brunch: sandwich, drink and coffee",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         }
       ]
@@ -55,7 +65,12 @@
     {
       "nombre": "Para compartir",
       "nota": "",
-      "traducciones": { "nombre_va": "Per a compartir", "nombre_en": "To share", "nota_va": "", "nota_en": "" },
+      "traducciones": {
+        "nombre_va": "Per a compartir",
+        "nombre_en": "To share",
+        "nota_va": "",
+        "nota_en": ""
+      },
       "platos": [
         {
           "nombre": "Tabla de quesos y frutas de temporada",
@@ -63,7 +78,8 @@
           "traducciones": {
             "nombre_va": "Taula de formatges i fruites de temporada",
             "nombre_en": "Cheese board with seasonal fruit",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -72,7 +88,8 @@
           "traducciones": {
             "nombre_va": "Taula d'embotits ibèrics amb crostons",
             "nombre_en": "Iberian charcuterie board with breadsticks",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -81,7 +98,8 @@
           "traducciones": {
             "nombre_va": "Croquetes casolanes de pernil (6 u.)",
             "nombre_en": "Homemade ham croquettes (6 pcs)",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -90,7 +108,8 @@
           "traducciones": {
             "nombre_va": "Braves del Casino",
             "nombre_en": "Casino-style patatas bravas",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -99,7 +118,8 @@
           "traducciones": {
             "nombre_va": "Ensaladilla russa amb ventresca",
             "nombre_en": "Russian salad with tuna belly",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         }
       ]
@@ -120,7 +140,8 @@
           "traducciones": {
             "nombre_va": "Arròs senyoret amb marisc",
             "nombre_en": "«Senyoret» seafood rice",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -129,7 +150,8 @@
           "traducciones": {
             "nombre_va": "Paella de marisc i carxofa",
             "nombre_en": "Seafood and artichoke paella",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -138,7 +160,8 @@
           "traducciones": {
             "nombre_va": "Arròs negre amb sépia i allioli",
             "nombre_en": "Black rice with cuttlefish and aioli",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -147,7 +170,8 @@
           "traducciones": {
             "nombre_va": "Fideuà de la costa",
             "nombre_en": "Coastal fideuà (noodle paella)",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         }
       ]
@@ -155,7 +179,12 @@
     {
       "nombre": "Del mercado",
       "nota": "",
-      "traducciones": { "nombre_va": "Del mercat", "nombre_en": "From the market", "nota_va": "", "nota_en": "" },
+      "traducciones": {
+        "nombre_va": "Del mercat",
+        "nombre_en": "From the market",
+        "nota_va": "",
+        "nota_en": ""
+      },
       "platos": [
         {
           "nombre": "Crudo de lubina con tomate cherry y cítricos",
@@ -163,7 +192,8 @@
           "traducciones": {
             "nombre_va": "Cru de llobarro amb tomaca cherry i cítrics",
             "nombre_en": "Sea bass crudo with cherry tomato and citrus",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -172,7 +202,8 @@
           "traducciones": {
             "nombre_va": "Polp a la brasa amb parmentier",
             "nombre_en": "Grilled octopus with potato parmentier",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -181,7 +212,8 @@
           "traducciones": {
             "nombre_va": "Bacallà confitat sobre samfaina",
             "nombre_en": "Confit cod over pisto ratatouille",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -190,7 +222,8 @@
           "traducciones": {
             "nombre_va": "Presa ibèrica a la brasa amb creïlla",
             "nombre_en": "Grilled Iberian pork with potatoes",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -199,7 +232,8 @@
           "traducciones": {
             "nombre_va": "Peix del dia a l'esquena amb ceba confitada",
             "nombre_en": "Catch of the day with caramelised onion",
-            "precio_va": "s/ mercat", "precio_en": "market price"
+            "precio_va": "s/ mercat",
+            "precio_en": "market price"
           }
         }
       ]
@@ -207,7 +241,12 @@
     {
       "nombre": "Dulces & cafés",
       "nota": "",
-      "traducciones": { "nombre_va": "Dolços & cafés", "nombre_en": "Sweets & coffee", "nota_va": "", "nota_en": "" },
+      "traducciones": {
+        "nombre_va": "Dolços & cafés",
+        "nombre_en": "Sweets & coffee",
+        "nota_va": "",
+        "nota_en": ""
+      },
       "platos": [
         {
           "nombre": "Coulant de chocolate con helado de vainilla",
@@ -215,7 +254,8 @@
           "traducciones": {
             "nombre_va": "Coulant de xocolata amb gelat de vainilla",
             "nombre_en": "Chocolate coulant with vanilla ice cream",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -224,16 +264,18 @@
           "traducciones": {
             "nombre_va": "Pastís de formatge al forn",
             "nombre_en": "Baked cheesecake",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
           "nombre": "Café de especialidad",
-          "precio": "1,80 €",
+          "precio": "12,50€",
           "traducciones": {
             "nombre_va": "Café d'especialitat",
             "nombre_en": "Specialty coffee",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         },
         {
@@ -242,7 +284,8 @@
           "traducciones": {
             "nombre_va": "Cigaló de Baileys",
             "nombre_en": "Baileys carajillo",
-            "precio_va": "", "precio_en": ""
+            "precio_va": "",
+            "precio_en": ""
           }
         }
       ]
