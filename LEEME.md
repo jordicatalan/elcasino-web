@@ -127,6 +127,28 @@ En `assets/css/styles.css`, arriba del todo, en `:root`.
 
 ---
 
+## 4-bis. Modo DEMOSTRACIÓN (sin internet ni Netlify)
+
+Para enseñar la web y el panel a un cliente **sin depender de Netlify** (ni gastar
+minutos de construcción), y con los cambios **instantáneos**:
+
+> Doble clic en **`DEMO.bat`**
+
+Abre tres ventanas (servidor web, servidor del panel y vigilante) y dos pestañas:
+- La web → `http://localhost:8000`
+- El panel → `http://localhost:8000/admin/`
+
+En modo local **el panel no pide contraseña**. Al pulsar *Publish*, el vigilante
+regenera la carta en ~1 segundo: refrescas la web y el cambio ya está.
+
+Para terminar, cierra las tres ventanas negras.
+
+> Los cambios hechos en modo demostración se guardan en `content/carta.json` de tu
+> ordenador, **no** se suben a la web publicada. Si quieres subirlos:
+> `git add -A && git commit -m "Carta actualizada" && git push`
+
+---
+
 ## 5. Trabajar en local
 
 ```bash
