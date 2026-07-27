@@ -1,105 +1,163 @@
 # El Casino Vila-real — Web
 
 Web premium, estática y **trilingüe** (Español / Valencià / English) para El Casino, en la Plaça de la Vila de Vila-real.
-No necesita servidor ni base de datos: son archivos que se suben a cualquier hosting.
+Incluye un **panel de administración** para que el dueño cambie la carta cuando quiera.
+
+- 📄 Guía para el jefe (cómo cambiar la carta): **[GUIA-CARTA.md](GUIA-CARTA.md)**
+- 🔧 Este archivo: cómo está montado y cómo publicarlo.
 
 ---
 
-## 1. Ver la web en tu ordenador
+## 1. Puesta en marcha del panel (SOLO LA PRIMERA VEZ)
 
-Haz doble clic en **`index.html`** y se abrirá en el navegador.
-(Para que los vídeos y el mapa funcionen igual que en producción, mejor usar un pequeño servidor local; ver el punto 5.)
+El panel necesita que la web se publique **desde GitHub**, no arrastrando la carpeta.
+Son 5 pasos y se hacen una sola vez.
+
+### Paso 1 · Subir el proyecto a GitHub
+El repositorio ya está creado y con el primer commit hecho. Solo falta enviarlo:
+
+1. Entra en [github.com/new](https://github.com/new) y crea un repositorio **privado** llamado `elcasino-web` (sin README ni .gitignore).
+2. En una terminal, dentro de esta carpeta, ejecuta (cambia `TU-USUARIO`):
+
+```bash
+git remote add origin https://github.com/TU-USUARIO/elcasino-web.git
+git push -u origin main
+```
+
+### Paso 2 · Conectar Netlify a GitHub
+1. En Netlify: **Add new site → Import an existing project → GitHub**.
+2. Elige el repositorio `elcasino-web`.
+3. Netlify leerá `netlify.toml` y pondrá solo la configuración:
+   - Build command: `node build.js`
+   - Publish directory: `.`
+4. Pulsa **Deploy**.
+
+> Si ya tenías el sitio creado arrastrando la carpeta, puedes conectarlo en
+> *Site configuration → Build & deploy → Link repository*, y así conservas el dominio.
+
+### Paso 3 · Activar el acceso (Identity)
+1. En tu sitio de Netlify: **Site configuration → Identity → Enable Identity**.
+2. En **Registration**, elige **Invite only** (solo por invitación). Importante.
+3. Baja hasta **Services → Git Gateway** y pulsa **Enable Git Gateway**.
+
+### Paso 4 · Invitar al dueño
+1. Pestaña **Identity → Invite users**.
+2. Escribe su email y envía.
+3. Le llegará un correo; al pincharlo elige contraseña y entra directo al panel.
+
+### Paso 5 · Comprobar
+Entra en `https://tusitio.netlify.app/admin` y prueba a cambiar un precio.
 
 ---
 
-## 2. Estructura de archivos
+## 2. Cómo funciona la carta (importante)
 
 ```
-index.html            → página principal (inicio)
-carta.html            → página de la carta completa (platos y precios)
-site.webmanifest      → datos de la app (nombre, colores)
-robots.txt            → permiso para Google
-sitemap.xml           → mapa para Google
+content/carta.json   ←  lo que edita el jefe desde /admin
+        ↓  (node build.js, lo lanza Netlify solo)
+carta.html           ←  GENERADO. No lo edites a mano.
+```
+
+Al guardar en el panel:
+1. Se guarda `content/carta.json` en GitHub.
+2. Netlify lanza `node build.js`.
+3. El script **traduce lo que falte** y regenera `carta.html` con los 3 idiomas y los datos para Google.
+4. La web queda actualizada (~2 minutos).
+
+### Traducción automática
+| Idioma | Motor | Notas |
+|---|---|---|
+| Valencià | Apertium | Gratis, sin clave. Muy bueno (usa *creïlla*, *tomaca*…) |
+| English | MyMemory (o DeepL) | Gratis. Ver abajo cómo mejorarlo |
+
+Las traducciones escritas a mano en el panel (*«Corregir traducciones»*) **siempre mandan**.
+Si un traductor falla, se deja el texto en español (nunca se rompe la web).
+
+**Mejorar el inglés (opcional, recomendado):** con una clave gratuita de
+[DeepL API Free](https://www.deepl.com/pro-api) la calidad sube mucho.
+En Netlify: *Site configuration → Environment variables → Add*:
+- Clave: `DEEPL_API_KEY`
+- Valor: tu clave (termina en `:fx`)
+
+---
+
+## 3. Estructura de archivos
+
+```
+index.html            → página principal
+carta.html            → GENERADA por build.js (no editar)
+build.js              → genera la carta y traduce
+content/carta.json    → LOS DATOS DE LA CARTA (lo que edita el panel)
+templates/            → plantilla de la página de carta
+admin/                → el panel de administración
+netlify.toml          → configuración de publicación
 assets/
-  css/styles.css      → COLORES y diseño
-  js/i18n.js          → TEXTOS en los 3 idiomas
+  css/styles.css      → colores y diseño
+  js/i18n.js          → textos fijos en los 3 idiomas
   js/main.js          → animaciones y funciones
-  img/                → fotos
-  video/              → vídeos
-  logo/               → logotipo
-  favicon.svg         → icono de la pestaña
+  img/ video/ logo/   → fotos, vídeos y logotipos
 ```
 
 ---
 
-## 3. Cómo editar lo más habitual
+## 4. Editar otras cosas (no la carta)
 
-### ✏️ Cambiar un texto
-Los textos están en **`assets/js/i18n.js`**, ordenados en tres bloques: `es` (español), `va` (valencià) y `en` (inglés).
-Busca la frase, cámbiala **en los tres idiomas** y guarda. El español también aparece en `index.html` (por SEO); cámbialo también allí si quieres que se vea sin JavaScript.
-
-### 🍽️ Cambiar la carta / precios
-La carta completa está en **`carta.html`** (en la página principal hay un botón que lleva a ella).
-- Los **nombres de los platos** están en `assets/js/i18n.js` (claves `d1_n`, `c1_n`, `a1_n`, `p1_n`, `du1_n`…). Cámbialos en los tres idiomas.
-- Los **precios** están en `carta.html`, dentro de `<span class="menu-item__price">`. Busca, por ejemplo, `6,90&nbsp;€` y edítalo. Si cambias precios, actualiza también el bloque `application/ld+json` del `<head>` de `carta.html` (es lo que lee Google).
-> La carta actual es **de muestra**. Sustitúyela por tus platos y precios reales.
-
-### 🎬 Vídeos de la galería
-Los dos vídeos de la galería se reproducen solos al hacer scroll (sin sonido) y, al pincharlos, se abren a pantalla grande **con sonido**. Están en `assets/video/`. Para cambiarlos, sustituye el archivo (mismo nombre) o edita la ruta en la galería de `index.html`.
+### ✏️ Textos de la web (no de la carta)
+Están en `assets/js/i18n.js`, en tres bloques: `es`, `va` y `en`. Cámbialos en los tres.
+El español también aparece en `index.html` (por SEO).
 
 ### 📞 Teléfono y WhatsApp
-El número es **689 22 94 79**. Si cambia, busca en `index.html` todas las apariciones de `689229479` (en los enlaces `wa.me/34689229479` y `tel:+34689229479`) y reemplázalas.
+Busca `689229479` en `index.html` y `templates/carta.template.html` y reemplázalo.
 
 ### 🕒 Horario
-1. En `index.html`, sección **Visítanos**, edita la lista de horas.
-2. En `assets/js/main.js`, edita la tabla `SCHED` para que el aviso **"Abierto ahora / Cerrado ahora"** siga siendo correcto (los minutos: 480 = 08:00, 1020 = 17:00, 1530 = 01:30 de la madrugada).
+1. En `index.html`, sección **Visítanos**, edita la lista.
+2. En `assets/js/main.js`, edita la tabla `SCHED` para que el aviso «Abierto ahora» siga bien
+   (480 = 08:00, 1020 = 17:00, 1530 = 01:30 de la madrugada).
 
-### 🖼️ Cambiar una foto
-Sustituye el archivo dentro de `assets/img/` **manteniendo el mismo nombre**, o sube uno nuevo y actualiza la ruta `src="assets/img/..."` en `index.html`. Recuerda cambiar también el texto `alt="..."` (describe la foto: ayuda al SEO y a la accesibilidad).
+### 🖼️ Fotos de la galería
+Sustituye el archivo en `assets/img/` con el mismo nombre, o cambia la ruta en `index.html`.
+Actualiza también el texto `alt="..."` (ayuda al SEO).
 
-### 🎨 Cambiar los colores
-En `assets/css/styles.css`, arriba del todo, en `:root`. Por ejemplo, el naranja de la marca es `--accent: #e8722b;`.
+### 🎬 Vídeos de la galería
+Se reproducen solos al hacer scroll (sin sonido) y al pincharlos se abren con sonido.
+Están en `assets/video/`.
 
-### ⭐ Opiniones
-Están en `index.html` (sección Opiniones) y en `i18n.js` (claves `rev_1` … `rev_9`).
-La primera (Enrique Caballero) es una **reseña real de Google**; las demás son **de ejemplo**: sustitúyelas por reseñas reales cuando quieras.
-
----
-
-## 4. Antes de publicar (IMPORTANTE)
-
-La web usa un dominio de ejemplo: **`elcasinovila-real.es`**.
-Cuando tengas tu dominio real, haz "Buscar y reemplazar" de `elcasinovila-real.es` por el tuyo en estos archivos:
-`index.html`, `robots.txt`, `sitemap.xml`.
-Esto es necesario para que el SEO (Google), las redes sociales y el mapa del sitio funcionen bien.
+### 🎨 Colores
+En `assets/css/styles.css`, arriba del todo, en `:root`.
 
 ---
 
-## 5. Publicar en un hosting (Hostinger, etc.)
+## 5. Trabajar en local
 
-1. Selecciona **todo el contenido de esta carpeta** (index.html, site.webmanifest, robots.txt, sitemap.xml y la carpeta `assets/`).
-2. En el **Administrador de archivos** de tu hosting, entra en la carpeta `public_html`.
-3. **Arrastra y suelta** los archivos ahí (o súbelos como .zip y descomprímelos dentro de `public_html`).
-4. ¡Listo! Tu web estará en tu dominio.
-
-> No hace falta subir la carpeta `elcasino.vila_real_20260724_130019_post` (son las fotos originales de Instagram) ni la carpeta `.claude`.
-
-### Servidor local para previsualizar (opcional)
-Con Python instalado, abre una terminal en esta carpeta y ejecuta:
+```bash
+node build.js
 ```
+Genera `carta.html`. Luego, para ver la web:
+```bash
 python -m http.server 8000
 ```
-Luego abre `http://localhost:8000` en el navegador.
+Y abre `http://localhost:8000`.
+
+> Si cambias `styles.css`, `i18n.js` o `main.js`, sube el número de `?v=2`
+> en `index.html` y `templates/carta.template.html` para que a los visitantes
+> no se les quede la versión antigua guardada.
 
 ---
 
-## 6. Notas sobre idiomas y SEO
+## 6. Antes de publicar con dominio propio
 
-- El idioma por defecto es **español** (el que ve Google y el visitante por primera vez).
-- El botón **ES / VAL / EN** de la cabecera cambia el idioma al instante y recuerda la preferencia.
-- También se puede enlazar directamente a un idioma: `tudominio.es/?lang=va` o `?lang=en`.
-- La web ya incluye: etiquetas para Google y redes (Open Graph), datos estructurados de restaurante (schema.org con dirección, teléfono y horario), `sitemap.xml` y `robots.txt`.
+La web usa un dominio de ejemplo: **`elcasinovila-real.es`**.
+Cuando tengas el definitivo, haz «Buscar y reemplazar» en:
+`index.html`, `templates/carta.template.html`, `build.js`, `robots.txt` y `sitemap.xml`.
 
 ---
 
-Hecho con cariño para El Casino · Plaça de la Vila, 1 · 12540 Vila-real (Castelló)
+## 7. Publicar sin GitHub (método antiguo)
+
+Si algún día quieres volver a arrastrar la carpeta a Netlify, ejecuta `node build.js`
+y sube: `index.html`, `carta.html`, `site.webmanifest`, `robots.txt`, `sitemap.xml` y `assets/`.
+⚠️ Con este método **el panel de administración no funciona**.
+
+---
+
+*Hecho con cariño para El Casino · Plaça de la Vila, 1 · 12540 Vila-real (Castelló)*
