@@ -1,0 +1,206 @@
+/* ============================================================
+   PANEL DE LA CARTA — identidad visual de El Casino
+   Solo cosmética (colores, tipografías, espacios).
+   Si algún selector no coincide, el panel sigue funcionando igual.
+   ============================================================ */
+
+:root {
+  --cs-cafe:       #1a1008;
+  --cs-cafe-2:     #241710;
+  --cs-naranja:    #a8480c;
+  --cs-naranja-2:  #e8722b;
+  --cs-naranja-3:  #8f3a08;
+  --cs-crema:      #faf4e9;
+  --cs-crema-2:    #f4ead7;
+  --cs-tinta:      #33241a;
+  --cs-tinta-2:    #6b5744;
+  --cs-borde:      rgba(74, 49, 32, 0.16);
+  --cs-serif:      "Playfair Display", Georgia, serif;
+  --cs-sans:       "Karla", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Tipografía general ---------- */
+body,
+#nc-root,
+#nc-root input,
+#nc-root textarea,
+#nc-root select,
+#nc-root button {
+  font-family: var(--cs-sans);
+}
+
+#nc-root h1,
+#nc-root h2,
+#nc-root [class*="CollectionTop"] h1 {
+  font-family: var(--cs-serif);
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Fondo general ---------- */
+#nc-root,
+#nc-root [class*="AppMainContainer"],
+#nc-root [class*="EditorContainer"],
+#nc-root [class*="CollectionContainer"] {
+  background-color: var(--cs-crema);
+}
+
+/* ============================================================
+   PANTALLA DE ACCESO
+   ============================================================ */
+#nc-root [class*="AuthenticationPage"] {
+  background:
+    radial-gradient(circle at 50% 34%, rgba(232, 114, 43, 0.16) 0%, transparent 46%),
+    linear-gradient(180deg, var(--cs-cafe) 0%, var(--cs-cafe-2) 100%);
+  min-height: 100vh;
+}
+
+/* Logo de la naranja en el acceso */
+#nc-root [class*="AuthenticationPage"] img {
+  border-radius: 50%;
+  width: 104px;
+  height: 104px;
+  object-fit: cover;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  margin-bottom: 1.6rem;
+}
+
+/* Botón de entrar */
+#nc-root [class*="LoginButton"],
+#nc-root [class*="AuthenticationPage"] button {
+  background-color: var(--cs-naranja) !important;
+  border-radius: 999px !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  padding: 1em 2.2em;
+  box-shadow: 0 12px 26px -14px rgba(168, 72, 12, 0.9);
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+#nc-root [class*="LoginButton"]:hover,
+#nc-root [class*="AuthenticationPage"] button:hover {
+  background-color: var(--cs-naranja-3) !important;
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   BARRA SUPERIOR
+   ============================================================ */
+#nc-root [class*="AppHeader"] {
+  background-color: var(--cs-cafe) !important;
+  box-shadow: 0 1px 0 rgba(246, 234, 217, 0.08), 0 8px 30px -18px rgba(0, 0, 0, 0.8);
+}
+
+#nc-root [class*="AppHeader"] a,
+#nc-root [class*="AppHeader"] button,
+#nc-root [class*="AppHeaderNavLink"] {
+  color: var(--cs-crema) !important;
+}
+
+#nc-root [class*="AppHeaderNavLink"][class*="active"],
+#nc-root [class*="AppHeaderNavLink"]:hover {
+  background-color: rgba(232, 114, 43, 0.22) !important;
+  border-radius: 999px;
+}
+
+/* El logotipo de la barra, redondeado */
+#nc-root [class*="AppHeader"] img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+/* Publicar / guardar: naranja de marca */
+#nc-root button[class*="PublishButton"],
+#nc-root [class*="ToolbarButton"][class*="primary"],
+#nc-root button[class*="SaveButton"] {
+  background-color: var(--cs-naranja) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+#nc-root button[class*="PublishButton"]:hover,
+#nc-root button[class*="SaveButton"]:hover {
+  background-color: var(--cs-naranja-3) !important;
+}
+
+/* Botones de "Añadir plato / categoría" */
+#nc-root [class*="ListItemTopBar"] button,
+#nc-root button[class*="AddButton"] {
+  color: var(--cs-naranja) !important;
+  font-weight: 700;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+#nc-root [class*="ControlContainer"] {
+  background-color: #fffdf8;
+  border: 1px solid var(--cs-borde);
+  border-radius: 12px;
+  padding: 4px 10px 10px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 10px rgba(26, 16, 8, 0.05);
+}
+
+/* Etiquetas de los campos */
+#nc-root [class*="FieldLabel"] {
+  color: var(--cs-naranja) !important;
+  font-weight: 700 !important;
+  font-size: 0.74rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+/* Cajas de texto */
+#nc-root input[type="text"],
+#nc-root textarea,
+#nc-root [class*="ControlContainer"] input {
+  font-size: 1rem;
+  color: var(--cs-tinta);
+}
+
+/* Texto de ayuda bajo los campos */
+#nc-root [class*="FieldHint"],
+#nc-root [class*="hint"] {
+  color: var(--cs-tinta-2) !important;
+  font-style: italic;
+}
+
+/* ============================================================
+   LISTAS (categorías y platos)
+   ============================================================ */
+#nc-root [class*="ListItemTopBar"] {
+  background-color: var(--cs-crema-2) !important;
+  border-radius: 10px 10px 0 0;
+}
+
+#nc-root [class*="NestedObjectLabel"],
+#nc-root [class*="ObjectWidgetTopBarContainer"] {
+  font-family: var(--cs-serif);
+  font-size: 1.02rem;
+  color: var(--cs-tinta);
+}
+
+#nc-root [class*="SortableList"] > div,
+#nc-root [class*="ListCard"] {
+  border-radius: 12px;
+}
+
+/* ============================================================
+   MENSAJES Y AVISOS
+   ============================================================ */
+#nc-root [class*="Toast"],
+#nc-root [class*="Notif"] {
+  border-radius: 12px !important;
+  font-weight: 600;
+}
+
+/* Barra de carga superior en naranja */
+#nc-root [class*="LoaderContainer"] [class*="Bar"],
+#nc-root [class*="progress"] {
+  background-color: var(--cs-naranja-2) !important;
+}

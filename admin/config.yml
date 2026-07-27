@@ -19,6 +19,8 @@ collections:
     label: 'Carta'
     label_singular: 'Carta'
     delete: false
+    editor:
+      preview: false
     files:
       - name: 'carta'
         label: 'Carta del restaurante'
