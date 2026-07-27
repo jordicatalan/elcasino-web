@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <!-- Set JS + saved language early to avoid FOUC -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
+      try {
+        var l = localStorage.getItem('casino-lang');
+        if (l) { d.setAttribute('lang', l); }
+      } catch (e) {}
+    })();
+  </script>
+
+  <title>El Casino Vila-real · Cafetería y Restaurante en la Plaça de la Vila</title>
+  <meta name="description" content="El Casino de Vila-real: cafetería y restaurante mediterráneo en la histórica Plaça de la Vila. Desayunos, arroces, tapas y una terraza con encanto bajo los arcos. El sabor de siempre, con el encanto de ahora." />
+  <meta name="author" content="El Casino Vila-real" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://elcasinovila-real.es/" />
+  <meta name="theme-color" content="#1a1008" />
+
+  <!-- hreflang (mismo documento, idioma seleccionable) -->
+  <link rel="alternate" hreflang="es" href="https://elcasinovila-real.es/" />
+  <link rel="alternate" hreflang="ca-ES-valencia" href="https://elcasinovila-real.es/?lang=va" />
+  <link rel="alternate" hreflang="en" href="https://elcasinovila-real.es/?lang=en" />
+  <link rel="alternate" hreflang="x-default" href="https://elcasinovila-real.es/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="restaurant" />
+  <meta property="og:site_name" content="El Casino Vila-real" />
+  <meta property="og:title" content="El Casino Vila-real · Cafetería y Restaurante" />
+  <meta property="og:description" content="En la histórica Plaça de la Vila. El sabor de siempre, con el encanto de ahora. Desayunos, arroces mediterráneos y una terraza con encanto bajo los arcos." />
+  <meta property="og:image" content="https://elcasinovila-real.es/assets/img/el-sabor-de-siempre-con-el-encanto-de-ahor-2.jpg" />
+  <meta property="og:image:alt" content="Terraza de El Casino en la Plaça de la Vila de Vila-real" />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:locale:alternate" content="ca_ES" />
+  <meta property="og:locale:alternate" content="en_GB" />
+  <meta property="og:url" content="https://elcasinovila-real.es/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="El Casino Vila-real · Cafetería y Restaurante" />
+  <meta name="twitter:description" content="En la histórica Plaça de la Vila. El sabor de siempre, con el encanto de ahora." />
+  <meta name="twitter:image" content="https://elcasinovila-real.es/assets/img/el-sabor-de-siempre-con-el-encanto-de-ahor-2.jpg" />
+
+  <!-- Icons & manifest -->
+  <link rel="icon" href="assets/logo/logo-instagram.jpg" type="image/jpeg" />
+  <link rel="apple-touch-icon" href="assets/logo/logo-instagram.jpg" />
+  <link rel="manifest" href="site.webmanifest" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/styles.css?v=2" />
+
+  <!-- Structured data: Restaurant -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "name": "El Casino Vila-real",
+    "image": [
+      "https://elcasinovila-real.es/assets/img/el-sabor-de-siempre-con-el-encanto-de-ahor-2.jpg",
+      "https://elcasinovila-real.es/assets/img/hay-sitios-que-lo-tienen-todo-y-este-es-un.jpg",
+      "https://elcasinovila-real.es/assets/img/si-pegas-el-oido-a-la-pantalla-puedes-oir.jpg"
+    ],
+    "@id": "https://elcasinovila-real.es/",
+    "url": "https://elcasinovila-real.es/",
+    "telephone": "+34689229479",
+    "priceRange": "€€",
+    "servesCuisine": ["Mediterránea", "Española", "Arroces", "Cafetería"],
+    "acceptsReservations": "True",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Plaça de la Vila, 1",
+      "addressLocality": "Vila-real",
+      "addressRegion": "Castelló",
+      "postalCode": "12540",
+      "addressCountry": "ES"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 39.9385,
+      "longitude": -0.1015
+    },
+    "sameAs": ["https://www.instagram.com/elcasino.vila_real/"],
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday"], "opens": "08:00", "closes": "17:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Thursday", "Friday", "Saturday"], "opens": "08:00", "closes": "01:30" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "08:00", "closes": "17:00" }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip">Saltar al contenido</a>
+
+  <!-- Preloader -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <img class="preloader__logo" src="assets/logo/logo-casino.png" alt="El Casino Vila-real" width="240" height="73" />
+  </div>
+
+  <!-- ===== HEADER / NAV ===== -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="#inicio" class="nav__logo" aria-label="El Casino Vila-real — inicio">
+        <img src="assets/logo/logo-casino.png" alt="El Casino Vila-real" width="150" height="46" />
+      </a>
+
+      <nav class="nav__links" id="navLinks" aria-label="Principal">
+        <a href="#historia" data-i18n="nav_historia">Historia</a>
+        <a href="#experiencia" data-i18n="nav_experiencia">Ambiente</a>
+        <a href="#carta" data-i18n="nav_carta">Carta</a>
+        <a href="#galeria" data-i18n="nav_galeria">Galería</a>
+        <a href="#opiniones" data-i18n="nav_opiniones">Opiniones</a>
+        <a href="#visitanos" data-i18n="nav_visitanos">Visítanos</a>
+      </nav>
+
+      <div class="nav__actions">
+        <div class="langswitch" role="group" aria-label="Idioma / Language">
+          <button type="button" class="langswitch__btn is-active" data-lang="es" aria-pressed="true">ES</button>
+          <button type="button" class="langswitch__btn" data-lang="va" aria-pressed="false">VAL</button>
+          <button type="button" class="langswitch__btn" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <a class="btn btn--pill nav__cta" href="https://wa.me/34689229479?text=Hola%2C%20me%20gustar%C3%ADa%20reservar%20una%20mesa%20en%20El%20Casino" target="_blank" rel="noopener" data-i18n="nav_reservar">Reservar</a>
+        <button type="button" class="nav__burger" id="navBurger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobilemenu" id="mobileMenu" aria-hidden="true">
+    <nav class="mobilemenu__links" aria-label="Menú móvil">
+      <a href="#historia" data-i18n="nav_historia">Historia</a>
+      <a href="#experiencia" data-i18n="nav_experiencia">Ambiente</a>
+      <a href="#carta" data-i18n="nav_carta">Carta</a>
+      <a href="#galeria" data-i18n="nav_galeria">Galería</a>
+      <a href="#opiniones" data-i18n="nav_opiniones">Opiniones</a>
+      <a href="#visitanos" data-i18n="nav_visitanos">Visítanos</a>
+    </nav>
+    <a class="btn btn--solid btn--lg" href="https://wa.me/34689229479?text=Hola%2C%20me%20gustar%C3%ADa%20reservar%20una%20mesa%20en%20El%20Casino" target="_blank" rel="noopener" data-i18n="nav_reservar">Reservar</a>
+    <a class="mobilemenu__ig" href="https://www.instagram.com/elcasino.vila_real/" target="_blank" rel="noopener">@elcasino.vila_real</a>
+  </div>
+
+  <main id="main">
+
+    <!-- ===== HERO (scroll-expand) ===== -->
+    <section class="hero" id="inicio">
+      <div class="hero__sticky">
+        <div class="hero__bg">
+          <img src="assets/img/hay-sitios-que-lo-tienen-todo-y-este-es-un.jpg" alt="Terraza de El Casino bajo los arcos de piedra de la Plaça de la Vila, Vila-real" fetchpriority="high" width="1480" height="987" />
+          <div class="hero__bg-veil"></div>
+        </div>
+
+        <div class="hero__media" id="heroMedia">
+          <video
+            class="hero__video"
+            poster="assets/img/el-sabor-de-siempre-con-el-encanto-de-ahor.jpg"
+            muted loop playsinline preload="none"
+            aria-label="Ambiente de El Casino Vila-real">
+            <source src="assets/video/lo-de-siempre-como-nunca.mp4" type="video/mp4" />
+          </video>
+          <div class="hero__media-veil"></div>
+        </div>
+
+        <div class="hero__content">
+          <p class="hero__eyebrow" data-i18n="hero_eyebrow">Vila-real · Plaça de la Vila · Desde 1910</p>
+          <h1 class="hero__title">
+            <span class="hero__title-line" data-i18n="hero_title_1">El Casino</span>
+          </h1>
+          <p class="hero__tagline" data-i18n="hero_tagline">El sabor de siempre, con el encanto de ahora.</p>
+          <div class="hero__cta">
+            <a class="btn btn--solid" href="#carta" data-i18n="hero_cta_carta">Ver la carta</a>
+            <a class="btn btn--ghost" href="https://wa.me/34689229479?text=Hola%2C%20me%20gustar%C3%ADa%20reservar%20una%20mesa%20en%20El%20Casino" target="_blank" rel="noopener" data-i18n="hero_cta_reservar">Reservar mesa</a>
+          </div>
+        </div>
+
+        <a href="#historia" class="hero__scroll" aria-label="Desplázate para descubrir">
+          <span data-i18n="hero_scroll">Descubre</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== HISTORIA ===== -->
+    <section class="historia section" id="historia">
+      <div class="wrap historia__grid">
+        <div class="historia__media reveal">
+          <img src="assets/img/empezamos-un-nuevo-ano-con-las-mismas-gana.jpg" alt="Fachada modernista del edificio de El Casino en la Plaça de la Vila de Vila-real" loading="lazy" width="1080" height="1440" />
+          <span class="historia__badge">1910</span>
+        </div>
+        <div class="historia__text">
+          <p class="eyebrow reveal" data-i18n="historia_eyebrow">Nuestra historia</p>
+          <h2 class="h2 reveal" data-i18n="historia_title">El corazón de Vila-real, desde 1910</h2>
+          <p class="lead reveal" data-i18n="historia_p1">El Casino nació hace más de un siglo como punto de encuentro de la vida social de Vila-real. Hoy reabre sus puertas con una nueva mirada: mantiene el alma del edificio histórico y le añade una cocina mediterránea cuidada, café de especialidad y una terraza con encanto bajo los arcos de la plaza.</p>
+          <p class="reveal" data-i18n="historia_p2">Aquí crecimos, aquí brindamos y aquí volvemos. Un lugar que se siente desde que te sientas.</p>
+          <ul class="historia__facts">
+            <li class="reveal"><strong data-i18n="fact_1_k">Ubicación</strong><span data-i18n="fact_1_v">Plaça de la Vila, junto al Ayuntamiento</span></li>
+            <li class="reveal"><strong data-i18n="fact_2_k">Cocina</strong><span data-i18n="fact_2_v">Mediterránea, de producto y de temporada</span></li>
+            <li class="reveal"><strong data-i18n="fact_3_k">Terraza</strong><span data-i18n="fact_3_v">Bajo los arcos históricos de la plaza</span></li>
+            <li class="reveal"><strong data-i18n="fact_4_k">Ambiente</strong><span data-i18n="fact_4_v">Desayunos, tapas, arroces y noches con música</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== EXPERIENCIA / AMBIENTE ===== -->
+    <section class="experiencia section section--dark" id="experiencia">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow reveal" data-i18n="exp_eyebrow">La experiencia</p>
+          <h2 class="h2 reveal" data-i18n="exp_title">Un lugar que se siente</h2>
+          <p class="section-head__lead reveal" data-i18n="exp_lead">Piedra centenaria, luz cálida y el murmullo de la plaza. En El Casino cada momento del día tiene su ritual: el café de la mañana, el almuerzo entre amigos, la sobremesa que no acaba y las noches con música en directo.</p>
+        </header>
+
+        <div class="experiencia__grid">
+          <figure class="exp-card reveal">
+            <img src="assets/img/hay-lugares-que-se-sienten-desde-que-te-si.jpg" alt="Comedor interior de El Casino con mesas de madera y detalles de eucalipto" loading="lazy" width="1480" height="987" />
+            <figcaption>
+              <h3 data-i18n="exp_c1_t">El interior</h3>
+              <p data-i18n="exp_c1_p">Salón acogedor para comidas de familia, de negocios o de siempre.</p>
+            </figcaption>
+          </figure>
+          <figure class="exp-card reveal">
+            <img src="assets/img/el-sabor-de-siempre-con-el-encanto-de-ahor.jpg" alt="Mesa de la terraza de El Casino con farol y sillas de bistró" loading="lazy" width="1480" height="987" />
+            <figcaption>
+              <h3 data-i18n="exp_c2_t">La terraza</h3>
+              <p data-i18n="exp_c2_p">Bajo los arcos de la Plaça de la Vila, a cualquier hora.</p>
+            </figcaption>
+          </figure>
+          <figure class="exp-card reveal">
+            <img src="assets/img/asi-de-bien-lo-pasamos-la-ultima-vez-y-se.jpg" alt="Noche de música en directo con guitarra entre los clientes de El Casino" loading="lazy" width="1290" height="1720" />
+            <figcaption>
+              <h3 data-i18n="exp_c3_t">Las noches</h3>
+              <p data-i18n="exp_c3_p">Música en directo y buen ambiente para brindar.</p>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CARTA (enlace a página) ===== -->
+    <section class="carta-cta section" id="carta">
+      <div class="carta-cta__media" aria-hidden="true">
+        <img src="assets/img/si-pegas-el-oido-a-la-pantalla-puedes-oir.jpg" alt="" loading="lazy" width="1290" height="1720" />
+        <div class="carta-cta__veil"></div>
+      </div>
+      <div class="wrap carta-cta__inner">
+        <p class="eyebrow reveal" data-i18n="carta_eyebrow">La carta</p>
+        <h2 class="h2 reveal" data-i18n="carta_title">Cocina mediterránea, sabor de aquí</h2>
+        <p class="carta-cta__lead reveal" data-i18n="carta_lead">Producto de temporada, arroces de los de siempre y bocados para compartir. Desayunos, tapas, arroces y dulces: toda nuestra carta en un mismo lugar.</p>
+        <a class="ihbtn reveal" href="carta.html" aria-label="Ver la carta completa de El Casino">
+          <span class="ihbtn__label" data-i18n="carta_btn">Ver la carta completa</span>
+          <span class="ihbtn__hover">
+            <span data-i18n="carta_btn">Ver la carta completa</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="ihbtn__dot" aria-hidden="true"></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== GALERÍA ===== -->
+    <section class="galeria section section--cream" id="galeria">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow reveal" data-i18n="gal_eyebrow">Galería</p>
+          <h2 class="h2 reveal" data-i18n="gal_title">Hay sitios que lo tienen todo</h2>
+        </header>
+        <div class="galeria__grid" id="galeriaGrid">
+          <button class="gal-item" data-type="image" data-src="assets/img/el-sabor-de-siempre-con-el-encanto-de-ahor-2.jpg" aria-label="Ampliar imagen">
+            <img src="assets/img/el-sabor-de-siempre-con-el-encanto-de-ahor-2.jpg" alt="Terraza llena de El Casino en la plaza, con olivos y sombrillas frente a la fachada con arcos" loading="lazy" width="1480" height="987" />
+          </button>
+          <button class="gal-item gal-item--video" data-type="video" data-src="assets/video/porque-cada-conversacion-merece-un-buen-ca.mp4" aria-label="Reproducir vídeo: un buen café en El Casino">
+            <video src="assets/video/porque-cada-conversacion-merece-un-buen-ca.mp4" muted loop playsinline preload="metadata" width="720" height="1280" aria-label="Vídeo de un café en El Casino"></video>
+            <span class="gal-item__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+          <button class="gal-item" data-type="image" data-src="assets/img/si-pegas-el-oido-a-la-pantalla-puedes-oir.jpg" aria-label="Ampliar imagen">
+            <img src="assets/img/si-pegas-el-oido-a-la-pantalla-puedes-oir.jpg" alt="Arroz meloso con gambas y alcachofa en paellera" loading="lazy" width="1290" height="1720" />
+          </button>
+          <button class="gal-item" data-type="image" data-src="assets/img/hay-lugares-que-se-sienten-desde-que-te-si.jpg" aria-label="Ampliar imagen">
+            <img src="assets/img/hay-lugares-que-se-sienten-desde-que-te-si.jpg" alt="Comedor interior acogedor de El Casino" loading="lazy" width="1480" height="987" />
+          </button>
+          <button class="gal-item gal-item--video" data-type="video" data-src="assets/video/el-lugar-ideal-para-cerrar-el-ano-con-sabo.mp4" aria-label="Reproducir vídeo: el lugar ideal para celebrar">
+            <video src="assets/video/el-lugar-ideal-para-cerrar-el-ano-con-sabo.mp4" muted loop playsinline preload="metadata" width="720" height="1280" aria-label="Vídeo del ambiente de El Casino"></video>
+            <span class="gal-item__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+          <button class="gal-item" data-type="image" data-src="assets/img/hay-caprichos-que-no-se-explican-se-piden.jpg" aria-label="Ampliar imagen">
+            <img src="assets/img/hay-caprichos-que-no-se-explican-se-piden.jpg" alt="Brioche dulce con crema de cacao, plátano, fresas y arándanos" loading="lazy" width="1080" height="1440" />
+          </button>
+          <button class="gal-item" data-type="image" data-src="assets/img/hay-sitios-que-lo-tienen-todo-y-este-es-un.jpg" aria-label="Ampliar imagen">
+            <img src="assets/img/hay-sitios-que-lo-tienen-todo-y-este-es-un.jpg" alt="Terraza bajo los arcos de piedra centenarios de la Plaça de la Vila" loading="lazy" width="1480" height="987" />
+          </button>
+          <button class="gal-item" data-type="image" data-src="assets/img/asi-de-bien-lo-pasamos-la-ultima-vez-y-se.jpg" aria-label="Ampliar imagen">
+            <img src="assets/img/asi-de-bien-lo-pasamos-la-ultima-vez-y-se.jpg" alt="Guitarrista cantando entre los clientes en una noche de música en directo" loading="lazy" width="1290" height="1720" />
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== OPINIONES ===== -->
+    <section class="opiniones section section--dark" id="opiniones">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow reveal" data-i18n="op_eyebrow">Opiniones</p>
+          <h2 class="h2 reveal" data-i18n="op_title">Opiniones que saben mejor que cualquier ingrediente</h2>
+          <p class="section-head__lead reveal" data-i18n="op_lead">Lo que dicen quienes ya se han sentado a nuestra mesa.</p>
+        </header>
+      </div>
+
+      <div class="opiniones__cols" id="opinionesCols" aria-label="Reseñas de clientes">
+        <!-- Columns are populated/duplicated by JS from these source cards -->
+        <div class="op-col" data-col="0">
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_1">Probamos uno de sus menús, de 10, comida de la zona y un muy buen servicio.</p><footer class="op-card__by"><span class="op-card__name">Enrique Caballero</span><span class="op-card__role">Local Guide · Google</span></footer></article>
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_2">Un rincón con muchísimo encanto en plena Plaça de la Vila. Los desayunos son espectaculares y el trato inmejorable.</p><footer class="op-card__by"><span class="op-card__name">María T.</span><span class="op-card__role">Vila-real</span></footer></article>
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_3">El arroz del Casino es de otro nivel y la terraza bajo los arcos es una maravilla para desconectar.</p><footer class="op-card__by"><span class="op-card__name">Vicent B.</span><span class="op-card__role">Google</span></footer></article>
+        </div>
+        <div class="op-col" data-col="1">
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_4">Volver al Casino es volver a casa. El sabor de siempre pero con un toque moderno que engancha.</p><footer class="op-card__by"><span class="op-card__name">Laura G.</span><span class="op-card__role">Vila-real</span></footer></article>
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_5">Café, buena compañía y un ambiente único. Las noches con música en directo son imprescindibles.</p><footer class="op-card__by"><span class="op-card__name">Sergio M.</span><span class="op-card__role">Google</span></footer></article>
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_6">Servicio atento y cercano, producto de la tierra y un local con historia. Repetiremos seguro.</p><footer class="op-card__by"><span class="op-card__name">Ana P.</span><span class="op-card__role">Vila-real</span></footer></article>
+        </div>
+        <div class="op-col" data-col="2">
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_7">Las tablas para compartir y una copa en la terraza… el plan perfecto en Vila-real.</p><footer class="op-card__by"><span class="op-card__name">Joan R.</span><span class="op-card__role">Google</span></footer></article>
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_8">Reformado con muchísimo gusto. Se nota el cariño en cada detalle y en cada plato.</p><footer class="op-card__by"><span class="op-card__name">Cristina L.</span><span class="op-card__role">Vila-real</span></footer></article>
+          <article class="op-card"><div class="op-card__stars" aria-label="5 de 5">★★★★★</div><p class="op-card__text" data-i18n="rev_9">De lo mejorcito de Vila-real para almorzar. Producto, trato y ubicación inmejorables.</p><footer class="op-card__by"><span class="op-card__name">David S.</span><span class="op-card__role">Google</span></footer></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VISÍTANOS ===== -->
+    <section class="visitanos section" id="visitanos">
+      <div class="wrap visitanos__grid">
+        <div class="visitanos__info">
+          <p class="eyebrow reveal" data-i18n="vis_eyebrow">Visítanos</p>
+          <h2 class="h2 reveal" data-i18n="vis_title">Te esperamos en la Plaça de la Vila</h2>
+
+          <div class="visitanos__block reveal">
+            <h3 class="visitanos__k" data-i18n="vis_dir_k">Dirección</h3>
+            <p class="visitanos__v">Plaça de la Vila, 1<br />12540 Vila-real, Castelló</p>
+            <a class="link-underline" href="https://www.google.com/maps/search/?api=1&query=El+Casino+Pla%C3%A7a+de+la+Vila+1+Vila-real" target="_blank" rel="noopener" data-i18n="vis_dir_map">Cómo llegar</a>
+          </div>
+
+          <div class="visitanos__block reveal">
+            <h3 class="visitanos__k">
+              <span data-i18n="vis_hor_k">Horario</span>
+              <span class="openbadge" id="openBadge" data-i18n="open_checking">·</span>
+            </h3>
+            <ul class="hours" id="hoursList">
+              <li data-day="1"><span data-i18n="day_mon">Lunes</span><span class="hours__closed" data-i18n="closed">Cerrado</span></li>
+              <li data-day="2"><span data-i18n="day_tue">Martes</span><span>08:00 – 17:00</span></li>
+              <li data-day="3"><span data-i18n="day_wed">Miércoles</span><span>08:00 – 17:00</span></li>
+              <li data-day="4"><span data-i18n="day_thu">Jueves</span><span>08:00 – 01:30</span></li>
+              <li data-day="5"><span data-i18n="day_fri">Viernes</span><span>08:00 – 01:30</span></li>
+              <li data-day="6"><span data-i18n="day_sat">Sábado</span><span>08:00 – 01:30</span></li>
+              <li data-day="0"><span data-i18n="day_sun">Domingo</span><span>08:00 – 17:00</span></li>
+            </ul>
+          </div>
+
+          <div class="visitanos__block reveal">
+            <h3 class="visitanos__k" data-i18n="vis_con_k">Reservas y contacto</h3>
+            <div class="visitanos__contact">
+              <a class="btn btn--solid btn--icon" href="https://wa.me/34689229479?text=Hola%2C%20me%20gustar%C3%ADa%20reservar%20una%20mesa%20en%20El%20Casino" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2m0 18.15c-1.53 0-3.03-.41-4.34-1.19l-.31-.18-3.11.82.83-3.03-.2-.32a8.2 8.2 0 0 1-1.26-4.36c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.23 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.42-.14 0-.31-.02-.47-.02-.16 0-.43.06-.65.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29"/></svg>
+                <span data-i18n="vis_wa">Reservar por WhatsApp</span>
+              </a>
+              <a class="visitanos__line" href="tel:+34689229479">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18"><path fill="currentColor" d="M6.62 10.79a15.5 15.5 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.4 11.4 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02z"/></svg>
+                689 22 94 79
+              </a>
+              <a class="visitanos__line" href="https://www.instagram.com/elcasino.vila_real/" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18"><path fill="currentColor" d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16m0 1.62c-3.15 0-3.52.01-4.76.07-1.15.05-1.77.25-2.19.41-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.16.42-.36 1.04-.41 2.19-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.05 1.15.25 1.77.41 2.19.21.55.47.94.88 1.35.41.41.8.67 1.35.88.42.16 1.04.36 2.19.41 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c1.15-.05 1.77-.25 2.19-.41.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.16-.42.36-1.04.41-2.19.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.05-1.15-.25-1.77-.41-2.19a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.42-.16-1.04-.36-2.19-.41-1.24-.06-1.61-.07-4.76-.07m0 2.76a5.46 5.46 0 1 0 0 10.92 5.46 5.46 0 0 0 0-10.92m0 9a3.54 3.54 0 1 1 0-7.08 3.54 3.54 0 0 1 0 7.08m6.95-9.22a1.28 1.28 0 1 1-2.55 0 1.28 1.28 0 0 1 2.55 0"/></svg>
+                @elcasino.vila_real
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="visitanos__map reveal">
+          <iframe
+            title="Mapa de El Casino en la Plaça de la Vila, Vila-real"
+            src="https://maps.google.com/maps?q=Pla%C3%A7a%20de%20la%20Vila%201%2C%2012540%20Vila-real%2C%20Castell%C3%B3&t=&z=17&ie=UTF8&iwloc=&output=embed"
+            loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="wrap footer__grid">
+      <div class="footer__brand">
+        <img src="assets/logo/logo-casino.png" alt="El Casino Vila-real" width="180" height="55" />
+        <p data-i18n="footer_tagline">El sabor de siempre, con el encanto de ahora.</p>
+      </div>
+      <nav class="footer__nav" aria-label="Pie de página">
+        <a href="#historia" data-i18n="nav_historia">Historia</a>
+        <a href="#carta" data-i18n="nav_carta">Carta</a>
+        <a href="#galeria" data-i18n="nav_galeria">Galería</a>
+        <a href="#opiniones" data-i18n="nav_opiniones">Opiniones</a>
+        <a href="#visitanos" data-i18n="nav_visitanos">Visítanos</a>
+      </nav>
+      <div class="footer__contact">
+        <p>Plaça de la Vila, 1 · 12540 Vila-real</p>
+        <p><a href="tel:+34689229479">689 22 94 79</a></p>
+        <p><a href="https://www.instagram.com/elcasino.vila_real/" target="_blank" rel="noopener">@elcasino.vila_real</a></p>
+      </div>
+    </div>
+    <div class="footer__bottom wrap">
+      <p>© <span id="year">2026</span> El Casino Vila-real. <span data-i18n="footer_rights">Todos los derechos reservados.</span></p>
+      <p class="footer__made" data-i18n="footer_made">Hecho con cariño en Vila-real</p>
+    </div>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+    <button class="lightbox__close" id="lightboxClose" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <img class="lightbox__img" id="lightboxImg" alt="" />
+    <video class="lightbox__video" id="lightboxVideo" controls playsinline preload="metadata"></video>
+  </div>
+
+  <!-- Acceso al panel de la carta (solo actúa si llega una invitación por email) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on('init', function (user) {
+        if (!user) {
+          window.netlifyIdentity.on('login', function () { document.location.href = '/admin/'; });
+        }
+      });
+    }
+  </script>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="assets/js/i18n.js?v=2" defer></script>
+  <script src="assets/js/main.js?v=2" defer></script>
+</body>
+</html>

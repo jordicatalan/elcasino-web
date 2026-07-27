@@ -1,0 +1,12 @@
+# Carpetas de trabajo que NO se suben
+.claude/
+publicar/
+node_modules/
+
+# Fotos y vídeos originales descargados de Instagram (ya están copiados en assets/)
+elcasino.vila_real_*/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

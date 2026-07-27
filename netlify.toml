@@ -1,0 +1,21 @@
+# Configuración de despliegue en Netlify
+# Cada vez que se guarda la carta desde /admin, Netlify vuelve a generar carta.html
+
+[build]
+  command = "node build.js"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# El panel no debe salir en Google
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# Archivos de trabajo: tampoco deben indexarse
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

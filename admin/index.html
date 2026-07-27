@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel de la carta · El Casino</title>
+  <link rel="icon" href="/assets/logo/logo-instagram.jpg" type="image/jpeg" />
+
+  <style>
+    /* Pantalla de bienvenida mientras carga el panel */
+    :root { --naranja: #a8480c; --cafe: #1a1008; --crema: #faf4e9; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    #cargando {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--cafe); color: var(--crema);
+      display: grid; place-items: center; text-align: center; padding: 2rem;
+    }
+    #cargando img { width: 110px; height: 110px; border-radius: 50%; margin-bottom: 1.4rem; }
+    #cargando h1 { font-size: 1.35rem; margin: 0 0 .5rem; font-weight: 600; }
+    #cargando p { margin: 0; opacity: .7; font-size: .95rem; }
+    /* Botón de acceso de Netlify Identity, en naranja de marca */
+    .btn.btn-lg.btn-primary { background: var(--naranja) !important; border-color: var(--naranja) !important; }
+  </style>
+</head>
+<body>
+  <div id="cargando">
+    <div>
+      <img src="/assets/logo/logo-instagram.jpg" alt="" />
+      <h1>Panel de la carta</h1>
+      <p>Cargando…</p>
+    </div>
+  </div>
+
+  <!-- Identidad (login por email) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Panel de edición -->
+  <script src="https://unpkg.com/decap-cms@^3.8.4/dist/decap-cms.js"></script>
+
+  <script>
+    // Quitar la pantalla de carga cuando el panel esté listo
+    function ocultarCarga() {
+      var c = document.getElementById('cargando');
+      if (c && c.parentNode) c.parentNode.removeChild(c);
+    }
+    window.addEventListener('load', function () { setTimeout(ocultarCarga, 900); });
+    setTimeout(ocultarCarga, 6000);
+
+    // Si el dueño acepta la invitación por email, llevarlo directo al panel
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on('init', function (user) {
+        if (!user) {
+          window.netlifyIdentity.on('login', function () { document.location.href = '/admin/'; });
+        }
+      });
+    }
+  </script>
+</body>
+</html>

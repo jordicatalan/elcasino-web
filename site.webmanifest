@@ -1,0 +1,13 @@
+{
+  "name": "El Casino Vila-real",
+  "short_name": "El Casino",
+  "description": "Cafetería y restaurante mediterráneo en la Plaça de la Vila, Vila-real.",
+  "lang": "es",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1008",
+  "theme_color": "#1a1008",
+  "icons": [
+    { "src": "assets/logo/logo-instagram.jpg", "sizes": "1080x1080", "type": "image/jpeg", "purpose": "any" }
+  ]
+}

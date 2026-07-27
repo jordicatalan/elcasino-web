@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://elcasinovila-real.es/sitemap.xml

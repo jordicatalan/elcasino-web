@@ -1,0 +1,88 @@
+backend:
+  name: git-gateway
+  branch: main
+  commit_messages:
+    update: 'Carta actualizada desde el panel'
+    openAuthoring: 'Carta actualizada desde el panel'
+
+locale: 'es'
+publish_mode: simple
+media_folder: 'assets/img'
+public_folder: 'assets/img'
+
+logo_url: /assets/logo/logo-instagram.jpg
+site_url: /
+display_url: /
+
+collections:
+  - name: 'carta'
+    label: 'Carta'
+    label_singular: 'Carta'
+    delete: false
+    files:
+      - name: 'carta'
+        label: 'Carta del restaurante'
+        file: 'content/carta.json'
+        description: >-
+          Escribe todo en ESPAÑOL. El valenciano y el inglés se traducen solos al guardar.
+          Si alguna traducción no te convence, ábrela en "Corregir traducciones" y escríbela a mano.
+          Los cambios tardan un par de minutos en verse en la web.
+        fields:
+          - label: 'Categorías de la carta'
+            name: 'categorias'
+            widget: 'list'
+            label_singular: 'Categoría'
+            summary: '{{fields.nombre}}'
+            collapsed: true
+            fields:
+              - label: 'Nombre de la categoría'
+                name: 'nombre'
+                widget: 'string'
+                hint: 'Por ejemplo: Arroces, Postres, Bebidas…'
+
+              - label: 'Nota de la categoría (opcional)'
+                name: 'nota'
+                widget: 'string'
+                required: false
+                default: ''
+                hint: 'Aviso que aparece bajo el título. Ej.: "Mínimo 2 personas. Precio por persona."'
+
+              - label: 'Platos'
+                name: 'platos'
+                widget: 'list'
+                label_singular: 'Plato'
+                summary: '{{fields.nombre}}  —  {{fields.precio}}'
+                collapsed: true
+                fields:
+                  - label: 'Nombre del plato'
+                    name: 'nombre'
+                    widget: 'string'
+                    hint: 'En español. Se traduce solo al valenciano y al inglés.'
+
+                  - label: 'Precio'
+                    name: 'precio'
+                    widget: 'string'
+                    default: '0,00 €'
+                    hint: 'Escríbelo tal cual quieres que se vea. Ej.: 12,50 €  ·  s/ mercado'
+
+                  - label: 'Corregir traducciones (opcional)'
+                    name: 'traducciones'
+                    widget: 'object'
+                    collapsed: true
+                    required: false
+                    fields:
+                      - { label: 'Nombre en valencià', name: 'nombre_va', widget: 'string', required: false, default: '' }
+                      - { label: 'Nombre en inglés', name: 'nombre_en', widget: 'string', required: false, default: '' }
+                      - { label: 'Precio en valencià', name: 'precio_va', widget: 'string', required: false, default: '' }
+                      - { label: 'Precio en inglés', name: 'precio_en', widget: 'string', required: false, default: '' }
+
+              - label: 'Corregir traducciones de la categoría (opcional)'
+                name: 'traducciones'
+                widget: 'object'
+                collapsed: true
+                required: false
+                fields:
+                  - { label: 'Categoría en valencià', name: 'nombre_va', widget: 'string', required: false, default: '' }
+                  - { label: 'Categoría en inglés', name: 'nombre_en', widget: 'string', required: false, default: '' }
+                  - { label: 'Nota en valencià', name: 'nota_va', widget: 'string', required: false, default: '' }
+                  - { label: 'Nota en inglés', name: 'nota_en', widget: 'string', required: false, default: '' }
