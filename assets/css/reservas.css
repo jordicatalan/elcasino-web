@@ -1,0 +1,236 @@
+/* ============================================================
+   EL CASINO — Modal de reservas de mesa
+   Reutiliza los tokens de color y tipografía de styles.css
+   ============================================================ */
+
+.rsv-overlay {
+  position: fixed; inset: 0; z-index: 250;
+  display: grid; place-items: center;
+  padding: clamp(0.8rem, 3vw, 2rem);
+  background: rgba(14, 8, 4, 0.82);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  opacity: 0; visibility: hidden;
+  transition: opacity .4s var(--ease), visibility .4s;
+  overflow-y: auto;
+}
+.rsv-overlay.is-open { opacity: 1; visibility: visible; }
+
+.rsv-modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(92vh, 900px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(18px) scale(.98);
+  transition: transform .45s var(--ease);
+}
+.rsv-overlay.is-open .rsv-modal { transform: none; }
+
+/* ---------- Cabecera ---------- */
+.rsv-head {
+  position: relative; overflow: hidden;
+  background: var(--espresso); color: var(--on-dark);
+  padding: clamp(1.6rem, 4vw, 2.2rem) clamp(1.3rem, 4vw, 2rem) clamp(1.2rem, 3vw, 1.6rem);
+  text-align: center;
+}
+.rsv-head__orange {
+  position: absolute; top: 50%; left: 50%;
+  width: 250px; height: auto; opacity: .16;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.rsv-head__txt { position: relative; z-index: 1; }
+.rsv-head h2 {
+  font-family: var(--serif); font-size: var(--step-2);
+  color: #fff; margin-bottom: .3rem;
+}
+.rsv-head p { color: var(--on-dark-soft); font-size: var(--step--1); }
+
+.rsv-close {
+  position: absolute; top: .8rem; right: .8rem; z-index: 2;
+  width: 42px; height: 42px; border-radius: 999px;
+  display: grid; place-items: center;
+  background: rgba(246,234,217,.14); color: var(--on-dark);
+  transition: background .3s;
+}
+.rsv-close:hover { background: rgba(246,234,217,.28); }
+.rsv-close svg { width: 20px; height: 20px; }
+
+/* ---------- Indicador de pasos ---------- */
+.rsv-pasos {
+  display: flex; gap: .4rem; justify-content: center;
+  padding: 1rem 1.2rem 0;
+}
+.rsv-paso {
+  flex: 1; max-width: 90px; height: 4px; border-radius: 999px;
+  background: var(--border); transition: background .4s var(--ease);
+}
+.rsv-paso.is-done, .rsv-paso.is-active { background: var(--accent-ink); }
+
+.rsv-cuerpo { padding: clamp(1.2rem, 4vw, 1.9rem); }
+
+.rsv-titulo {
+  font-family: var(--serif); font-size: var(--step-1);
+  color: var(--ink); margin-bottom: .3rem;
+}
+.rsv-ayuda { color: var(--ink-soft); font-size: var(--step--1); margin-bottom: 1.1rem; }
+
+/* El JS reemplaza el contenido de .rsv-cuerpo en cada paso. Los hijos son
+   elementos nuevos, de modo que el efecto de entrada se dispara solo. */
+.rsv-cuerpo > * { animation: rsvIn .45s var(--ease); }
+@keyframes rsvIn { from { opacity: 0; transform: translateY(10px); } }
+
+/* ---------- Paso 1: personas ---------- */
+.rsv-personas { display: flex; flex-wrap: wrap; gap: .5rem; }
+.rsv-chip {
+  min-width: 52px; padding: .75em 1em;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: #fff; color: var(--ink);
+  font-weight: 600; font-variant-numeric: tabular-nums;
+  transition: background .25s var(--ease), border-color .25s var(--ease),
+              color .25s var(--ease), transform .25s var(--ease);
+}
+.rsv-chip:hover:not(:disabled) { border-color: var(--accent-ink); transform: translateY(-2px); }
+.rsv-chip.is-sel { background: var(--accent-ink); border-color: var(--accent-ink); color: #fff; }
+.rsv-chip:disabled { opacity: .34; cursor: not-allowed; text-decoration: line-through; }
+
+/* ---------- Paso 2: calendario ---------- */
+.rsv-cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: .8rem;
+}
+.rsv-cal-mes {
+  font-family: var(--serif); font-size: var(--step-1);
+  color: var(--ink); text-transform: capitalize;
+}
+.rsv-cal-btn {
+  width: 38px; height: 38px; border-radius: 999px;
+  display: grid; place-items: center;
+  border: 1px solid var(--border); color: var(--ink);
+  transition: background .25s, border-color .25s;
+}
+.rsv-cal-btn:hover:not(:disabled) { background: var(--cream-2); border-color: var(--accent-ink); }
+.rsv-cal-btn:disabled { opacity: .3; cursor: not-allowed; }
+.rsv-cal-btn svg { width: 18px; height: 18px; }
+
+.rsv-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.rsv-cal-dow {
+  text-align: center; font-size: .68rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-soft); padding-bottom: .4rem;
+}
+.rsv-dia {
+  aspect-ratio: 1; border-radius: 10px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums;
+  transition: background .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+}
+.rsv-dia:hover:not(:disabled) { background: var(--cream-2); border-color: var(--accent); }
+.rsv-dia.is-sel { background: var(--accent-ink); color: #fff; }
+.rsv-dia:disabled { opacity: .26; cursor: not-allowed; }
+.rsv-dia.is-vacio { visibility: hidden; }
+
+/* ---------- Paso 3: horas ---------- */
+.rsv-horas { display: flex; flex-wrap: wrap; gap: .5rem; }
+.rsv-servicio {
+  width: 100%; font-size: .72rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent-ink); margin: .8rem 0 .2rem;
+}
+.rsv-servicio:first-child { margin-top: 0; }
+
+/* ---------- Paso 4: datos ---------- */
+.rsv-campo { margin-bottom: .95rem; }
+.rsv-campo label {
+  display: block; font-size: .74rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent-ink); margin-bottom: .35rem;
+}
+.rsv-campo input, .rsv-campo textarea {
+  width: 100%; padding: .8em .95em;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: #fff; color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px; /* 16px evita que iOS haga zoom al enfocar */
+  transition: border-color .25s, box-shadow .25s;
+}
+.rsv-campo input:focus, .rsv-campo textarea:focus {
+  outline: none; border-color: var(--accent-ink);
+  box-shadow: 0 0 0 3px rgba(168, 72, 12, .14);
+}
+.rsv-campo textarea { resize: vertical; min-height: 72px; }
+.rsv-campo.tiene-error input { border-color: #b0342a; }
+.rsv-error-campo { color: #96271e; font-size: .8rem; margin-top: .3rem; }
+
+.rsv-consent {
+  display: flex; gap: .6rem; align-items: flex-start;
+  font-size: .82rem; color: var(--ink-soft); line-height: 1.5;
+  margin: 1rem 0 .4rem;
+}
+.rsv-consent input {
+  width: 18px; height: 18px; margin-top: .15rem; flex: none;
+  accent-color: var(--accent-ink);
+}
+.rsv-consent a { color: var(--accent-ink); text-decoration: underline; }
+
+/* ---------- Resumen de la reserva ---------- */
+.rsv-resumen {
+  background: var(--cream-2); border-radius: 12px;
+  padding: .9rem 1.1rem; margin-bottom: 1.2rem;
+  display: grid; gap: .35rem;
+}
+.rsv-resumen > div { display: flex; justify-content: space-between; gap: 1rem; font-size: .92rem; }
+.rsv-resumen .k { color: var(--ink-soft); }
+.rsv-resumen .v { font-weight: 700; color: var(--ink); text-align: right; }
+
+/* ---------- Acciones ---------- */
+.rsv-acciones { display: flex; gap: .6rem; margin-top: 1.3rem; }
+.rsv-acciones .btn { flex: 1; }
+.rsv-atras {
+  background: transparent; border: 1px solid var(--border); color: var(--ink-soft);
+  border-radius: 999px; padding: .95em 1.4em; font-weight: 600;
+  font-size: var(--step--1); letter-spacing: .06em; text-transform: uppercase;
+  transition: border-color .25s, color .25s;
+}
+.rsv-atras:hover { border-color: var(--ink-soft); color: var(--ink); }
+
+/* ---------- Avisos y carga ---------- */
+.rsv-aviso {
+  padding: .85rem 1rem; border-radius: 10px;
+  font-size: .9rem; margin-bottom: 1rem;
+}
+.rsv-aviso--error { background: rgba(176, 52, 42, .1); color: #8f2a22; }
+.rsv-aviso--info  { background: var(--cream-2); color: var(--ink-soft); }
+
+.rsv-cargando { text-align: center; padding: 2rem 0; color: var(--ink-soft); }
+.rsv-spinner {
+  width: 34px; height: 34px; margin: 0 auto .8rem;
+  border: 3px solid var(--border); border-top-color: var(--accent-ink);
+  border-radius: 50%; animation: rsvGira .8s linear infinite;
+}
+@keyframes rsvGira { to { transform: rotate(360deg); } }
+
+/* ---------- Confirmación final ---------- */
+.rsv-ok { text-align: center; padding: 1rem 0; }
+.rsv-ok__icono {
+  width: 68px; height: 68px; margin: 0 auto 1.1rem;
+  border-radius: 999px; display: grid; place-items: center;
+  background: rgba(34, 139, 76, .14); color: #1f7a44;
+}
+.rsv-ok__icono svg { width: 34px; height: 34px; }
+.rsv-ok h3 { font-family: var(--serif); font-size: var(--step-2); color: var(--ink); margin-bottom: .5rem; }
+.rsv-ok p { color: var(--ink-soft); margin-bottom: 1.2rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+  .rsv-overlay { padding: 0; align-items: flex-end; }
+  .rsv-modal { max-height: 94vh; width: 100%; border-radius: 20px 20px 0 0; }
+  .rsv-acciones { flex-direction: column-reverse; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rsv-overlay, .rsv-modal, .rsv-cuerpo > * { transition: none; animation: none; }
+  .rsv-spinner { animation-duration: 2.5s; }
+}

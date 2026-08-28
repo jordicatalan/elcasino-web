@@ -17,7 +17,12 @@ echo.
 start "El Casino - Servidor web" cmd /k "python -m http.server 8000"
 timeout /t 2 >nul
 
-start "El Casino - Panel" cmd /k "npx -y decap-server"
+where decap-server >nul 2>&1
+if %errorlevel%==0 (
+  start "El Casino - Panel" cmd /k "decap-server"
+) else (
+  start "El Casino - Panel" cmd /k "npx -y decap-server"
+)
 timeout /t 3 >nul
 
 start "El Casino - Vigilante" cmd /k "node vigilar.js"

@@ -19,3 +19,16 @@
   for = "/content/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
+
+# El panel de reservas tampoco debe indexarse
+[[headers]]
+  for = "/reservas-admin.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# La pagina de cancelacion lleva un testigo en la URL: fuera de los buscadores
+[[headers]]
+  for = "/cancelar.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"

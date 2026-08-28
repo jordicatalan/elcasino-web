@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js'); d.classList.add('js');
+      try { var l = localStorage.getItem('casino-lang'); if (l) d.setAttribute('lang', l); } catch (e) {}
+    })();
+  </script>
+
+  <title>Política de privacidad · El Casino Vila-real</title>
+  <meta name="description" content="Cómo trata El Casino Vila-real los datos personales que facilitas al reservar mesa: qué recogemos, para qué, cuánto tiempo y cómo ejercer tus derechos." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://elcasinovila-real.es/privacidad.html" />
+  <meta name="theme-color" content="#1a1008" />
+
+  <link rel="icon" href="assets/logo/logo-instagram.jpg" type="image/jpeg" />
+  <link rel="apple-touch-icon" href="assets/logo/logo-instagram.jpg" />
+  <link rel="manifest" href="site.webmanifest" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=2" />
+
+  <style>
+    /* Estilos propios de las paginas legales: prosa larga y estrecha */
+    .legal { padding-top: clamp(7rem, 14vw, 10rem); padding-bottom: clamp(3rem, 8vw, 6rem); }
+    .legal__wrap { max-width: 46rem; margin: 0 auto; padding-inline: clamp(1.2rem, 5vw, 2rem); }
+    .legal h1 { font-family: var(--serif); font-size: var(--step-3); color: var(--ink); margin-bottom: .6rem; }
+    .legal__fecha { color: var(--ink-soft); font-size: var(--step--1); margin-bottom: 2.4rem; }
+    .legal h2 {
+      font-family: var(--serif); font-size: var(--step-1); color: var(--ink);
+      margin: 2.4rem 0 .7rem; padding-top: 1.6rem; border-top: 1px solid var(--border);
+    }
+    .legal h2:first-of-type { border-top: 0; padding-top: 0; }
+    .legal p, .legal li { color: var(--ink-soft); line-height: 1.75; margin-bottom: .9rem; }
+    .legal strong { color: var(--ink); font-weight: 600; }
+    .legal ul { padding-left: 1.2rem; margin-bottom: 1.2rem; }
+    .legal li { margin-bottom: .5rem; }
+    .legal li::marker { color: var(--accent-ink); }
+    .legal a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: .2em; }
+
+    .legal__tabla { width: 100%; border-collapse: collapse; margin: 1rem 0 1.6rem; font-size: .95rem; }
+    .legal__tabla th, .legal__tabla td {
+      text-align: left; padding: .7rem .8rem; border-bottom: 1px solid var(--border);
+      vertical-align: top; color: var(--ink-soft);
+    }
+    .legal__tabla th { color: var(--ink); font-weight: 700; font-size: .78rem;
+                       letter-spacing: .1em; text-transform: uppercase; }
+    .legal__scroll { overflow-x: auto; }
+
+    .legal__nota {
+      background: var(--cream-2); border-left: 3px solid var(--accent-ink);
+      border-radius: 0 10px 10px 0; padding: 1rem 1.2rem; margin: 1.4rem 0;
+    }
+    .legal__nota p:last-child { margin-bottom: 0; }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#legal-main" data-i18n="skip">Saltar al contenido</a>
+
+  <!-- NAV -->
+  <header class="nav is-scrolled" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" aria-label="El Casino Vila-real — inicio">
+        <img src="assets/logo/logo-casino.png" alt="El Casino Vila-real" width="150" height="46" />
+      </a>
+      <nav class="nav__links" aria-label="Principal">
+        <a href="index.html#historia" data-i18n="nav_historia">Historia</a>
+        <a href="carta.html" data-i18n="nav_carta">Carta</a>
+        <a href="index.html#galeria" data-i18n="nav_galeria">Galería</a>
+        <a href="index.html#opiniones" data-i18n="nav_opiniones">Opiniones</a>
+        <a href="index.html#visitanos" data-i18n="nav_visitanos">Visítanos</a>
+      </nav>
+      <div class="nav__actions">
+        <div class="langswitch" role="group" aria-label="Idioma / Language">
+          <button type="button" class="langswitch__btn is-active" data-lang="es" aria-pressed="true">ES</button>
+          <button type="button" class="langswitch__btn" data-lang="va" aria-pressed="false">VAL</button>
+          <button type="button" class="langswitch__btn" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <a class="btn btn--pill nav__cta" href="index.html" data-reserva data-i18n="nav_reservar">Reservar</a>
+        <button type="button" class="nav__burger" id="navBurger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobilemenu" id="mobileMenu" aria-hidden="true">
+    <nav class="mobilemenu__links" aria-label="Menú móvil">
+      <a href="index.html#historia" data-i18n="nav_historia">Historia</a>
+      <a href="carta.html" data-i18n="nav_carta">Carta</a>
+      <a href="index.html#galeria" data-i18n="nav_galeria">Galería</a>
+      <a href="index.html#opiniones" data-i18n="nav_opiniones">Opiniones</a>
+      <a href="index.html#visitanos" data-i18n="nav_visitanos">Visítanos</a>
+    </nav>
+    <a class="btn btn--solid btn--lg" href="index.html" data-reserva data-i18n="nav_reservar">Reservar</a>
+    <a class="mobilemenu__ig" href="index.html" data-i18n="menu_back">Volver al inicio</a>
+  </div>
+
+  <main id="legal-main" class="legal">
+    <div class="legal__wrap">
+      <p class="eyebrow">Información legal</p>
+      <h1>Política de privacidad</h1>
+      <p class="legal__fecha">Última actualización: 28 de agosto de 2026</p>
+
+      <p>Esta página explica qué datos personales recoge El Casino Vila-real a través de esta web,
+         con qué finalidad los usa y qué puedes hacer para controlarlos. Está redactada conforme al
+         Reglamento (UE) 2016/679 (RGPD) y a la Ley Orgánica 3/2018 (LOPDGDD).</p>
+
+      <h2>1. Quién trata tus datos</h2>
+      <div class="legal__scroll">
+        <table class="legal__tabla">
+          <tbody>
+            <tr><th scope="row">Responsable</th><td>[RAZÓN SOCIAL] — nombre comercial <strong>El Casino Vila-real</strong></td></tr>
+            <tr><th scope="row">NIF/CIF</th><td>[CIF]</td></tr>
+            <tr><th scope="row">Dirección</th><td>Plaça de la Vila, 1 · 12540 Vila-real (Castelló)</td></tr>
+            <tr><th scope="row">Teléfono</th><td><a href="tel:+34689229479">689 22 94 79</a></td></tr>
+            <tr><th scope="row">Contacto para privacidad</th><td>[CORREO DE CONTACTO]</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>2. Qué datos recogemos y para qué</h2>
+      <p>Solo tratamos los datos que nos das voluntariamente al <strong>reservar una mesa</strong>.
+         Esta web no tiene publicidad, ni analítica, ni perfilado, ni comparte datos con redes sociales.</p>
+
+      <div class="legal__scroll">
+        <table class="legal__tabla">
+          <thead>
+            <tr><th>Dato</th><th>Para qué</th><th>¿Obligatorio?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Nombre y apellido</td><td>Identificar la reserva al llegar</td><td>Sí</td></tr>
+            <tr><td>Teléfono</td><td>Avisarte si surge un imprevisto con tu mesa</td><td>Sí</td></tr>
+            <tr><td>Correo electrónico</td><td>Enviarte la confirmación de la reserva</td><td>No</td></tr>
+            <tr><td>Número de comensales, fecha y hora</td><td>Reservar el espacio y controlar el aforo</td><td>Sí</td></tr>
+            <tr><td>Notas (alergias, trona, celebración…)</td><td>Atenderte mejor</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legal__nota">
+        <p>Si en las notas nos indicas una <strong>alergia o intolerancia</strong>, ese dato se refiere a tu salud.
+           Lo tratamos únicamente para poder servirte con seguridad, con tu consentimiento explícito al
+           escribirlo, y lo borramos junto con el resto de la reserva. No hace falta que lo indiques:
+           también puedes decírnoslo en persona al llegar.</p>
+      </div>
+
+      <h2>3. Base legal</h2>
+      <ul>
+        <li><strong>Ejecución de un contrato</strong> (art. 6.1.b RGPD) para gestionar la reserva:
+            sin nombre, teléfono y número de comensales no podemos guardarte la mesa.</li>
+        <li><strong>Consentimiento</strong> (art. 6.1.a) para el correo electrónico y las notas,
+            que son opcionales. Puedes retirarlo cuando quieras.</li>
+        <li><strong>Consentimiento explícito</strong> (art. 9.2.a) si nos comunicas una alergia
+            o intolerancia alimentaria.</li>
+        <li><strong>Interés legítimo</strong> (art. 6.1.f) para conservar un registro básico de
+            reservas y evitar ausencias reiteradas sin aviso.</li>
+      </ul>
+
+      <h2>4. Cuánto tiempo los guardamos</h2>
+      <p>Conservamos los datos de tu reserva durante <strong>12 meses</strong> desde la fecha reservada,
+         y después los eliminamos. Si nos pides antes que los borremos, lo hacemos de inmediato,
+         salvo que exista una obligación legal de conservarlos (por ejemplo, una factura).</p>
+
+      <h2>5. Quién más puede verlos</h2>
+      <p>No vendemos ni cedemos tus datos a nadie. Únicamente los tratan, por cuenta nuestra y bajo
+         contrato de encargado de tratamiento:</p>
+      <ul>
+        <li><strong>Supabase</strong> — base de datos donde se guarda la reserva. Los servidores están
+            en el <strong>Reino Unido (Londres)</strong>, país con decisión de adecuación de la Comisión
+            Europea, por lo que la transferencia cuenta con las garantías del art. 45 RGPD.</li>
+        <li><strong>Netlify</strong> — alojamiento de esta web.</li>
+        <li>El personal de El Casino que gestiona el comedor.</li>
+      </ul>
+      <p>También pueden acceder las autoridades competentes cuando la ley lo exija.</p>
+
+      <h2>6. Tus derechos</h2>
+      <p>Puedes ejercer en cualquier momento los derechos de <strong>acceso, rectificación, supresión,
+         oposición, limitación del tratamiento y portabilidad</strong>, así como retirar tu consentimiento.</p>
+      <p>Para hacerlo, escríbenos a [CORREO DE CONTACTO] o llámanos al
+         <a href="tel:+34689229479">689 22 94 79</a> indicando qué derecho quieres ejercer. Te
+         responderemos en el plazo máximo de un mes.</p>
+      <p>Si crees que no hemos atendido tu solicitud correctamente, puedes reclamar ante la
+         <a href="https://www.aepd.es" target="_blank" rel="noopener">Agencia Española de Protección
+         de Datos (AEPD)</a>, C/ Jorge Juan 6, 28001 Madrid.</p>
+
+      <h2>7. Cookies y almacenamiento en tu navegador</h2>
+      <p><strong>Esta web no usa cookies</strong> de análisis, publicidad ni seguimiento.</p>
+      <p>Lo único que se guarda en tu navegador es el <strong>idioma que eliges</strong> (español,
+         valenciano o inglés), para que no tengas que seleccionarlo de nuevo en cada visita. Es un dato
+         técnico, no identifica a nadie, no sale de tu dispositivo y está exento de consentimiento
+         según el art. 22.2 de la LSSI. Puedes borrarlo vaciando los datos del sitio en tu navegador.</p>
+
+      <h2>8. Seguridad</h2>
+      <p>Las reservas viajan cifradas (HTTPS) y se guardan con reglas de acceso que impiden que un
+         visitante de la web pueda leer las reservas de otras personas. Solo el personal autorizado,
+         mediante usuario y contraseña, accede al listado.</p>
+
+      <h2>9. Cambios en esta política</h2>
+      <p>Si modificamos esta política publicaremos aquí la nueva versión y actualizaremos la fecha del
+         encabezado. Te recomendamos revisarla de vez en cuando.</p>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap footer__grid">
+      <div class="footer__brand">
+        <img src="assets/logo/logo-casino.png" alt="El Casino Vila-real" width="180" height="55" />
+        <p data-i18n="footer_tagline">El sabor de siempre, con el encanto de ahora.</p>
+      </div>
+      <nav class="footer__nav" aria-label="Pie de página">
+        <a href="index.html#historia" data-i18n="nav_historia">Historia</a>
+        <a href="carta.html" data-i18n="nav_carta">Carta</a>
+        <a href="index.html#galeria" data-i18n="nav_galeria">Galería</a>
+        <a href="index.html#opiniones" data-i18n="nav_opiniones">Opiniones</a>
+        <a href="index.html#visitanos" data-i18n="nav_visitanos">Visítanos</a>
+      </nav>
+      <div class="footer__contact">
+        <p>Plaça de la Vila, 1 · 12540 Vila-real</p>
+        <p><a href="tel:+34689229479">689 22 94 79</a></p>
+        <p><a href="https://www.instagram.com/elcasino.vila_real/" target="_blank" rel="noopener">@elcasino.vila_real</a></p>
+      </div>
+    </div>
+    <div class="footer__bottom wrap">
+      <p>© <span id="year">2026</span> El Casino Vila-real. <span data-i18n="footer_rights">Todos los derechos reservados.</span> · <a href="privacidad.html" data-i18n="footer_privacidad">Privacidad</a></p>
+      <p class="footer__made" data-i18n="footer_made">Hecho con cariño en Vila-real</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/i18n.js?v=2" defer></script>
+  <script src="assets/js/main.js?v=2" defer></script>
+</body>
+</html>

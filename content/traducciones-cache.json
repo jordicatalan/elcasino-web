@@ -1,0 +1,12 @@
+{
+  "va::Prueba": "Prova",
+  "en::Prueba": "Test",
+  "va::Prueba plato categoria prueba": "Prova plat categoria prova",
+  "en::Prueba plato categoria prueba": "Test plate category test",
+  "va::Hola esto es una prueba": "Hola això és una prova",
+  "en::Hola esto es una prueba": "hello this is a test 123",
+  "va::prueba categoria": "prova categoria",
+  "en::prueba categoria": "category test",
+  "va::prueba plato": "prova plat",
+  "en::prueba plato": "dish test"
+}
