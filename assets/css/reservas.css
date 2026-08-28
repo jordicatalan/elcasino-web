@@ -234,3 +234,10 @@
   .rsv-overlay, .rsv-modal, .rsv-cuerpo > * { transition: none; animation: none; }
   .rsv-spinner { animation-duration: 2.5s; }
 }
+
+.rsv-ayuda-campo {
+  margin-top: .35rem;
+  font-size: .8rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}

@@ -239,8 +239,10 @@ begin
     return jsonb_build_object('ok', false, 'error', 'telefono_invalido');
   end if;
 
-  if p_email is not null and btrim(p_email) <> ''
-     and p_email !~ '^[^@[:space:]]+@[^@[:space:]]+[.][^@[:space:]]+$' then
+  -- El correo es obligatorio: sin él no hay confirmación ni enlace para
+  -- cancelar, y el cliente se queda sin comprobante de nada.
+  if p_email is null or btrim(p_email) = ''
+     or p_email !~ '^[^@[:space:]]+@[^@[:space:]]+[.][^@[:space:]]+$' then
     return jsonb_build_object('ok', false, 'error', 'email_invalido');
   end if;
 

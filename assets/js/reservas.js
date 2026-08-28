@@ -341,8 +341,11 @@
       '  <input type="text" id="rsvNombre" autocomplete="name" required /></div>' +
       '<div class="rsv-campo"><label for="rsvTel">Teléfono *</label>' +
       '  <input type="tel" id="rsvTel" autocomplete="tel" inputmode="tel" required /></div>' +
-      '<div class="rsv-campo"><label for="rsvEmail">Email (opcional)</label>' +
-      '  <input type="email" id="rsvEmail" autocomplete="email" inputmode="email" /></div>' +
+      '<div class="rsv-campo"><label for="rsvEmail">Email *</label>' +
+      '  <input type="email" id="rsvEmail" autocomplete="email" inputmode="email" required ' +
+      '         aria-describedby="rsvEmailAyuda" />' +
+      '  <p class="rsv-ayuda-campo" id="rsvEmailAyuda">Ahí te mandamos la confirmación ' +
+      'y el enlace para cancelar si al final no puedes venir.</p></div>' +
       '<div class="rsv-campo"><label for="rsvNotas">Alergias o peticiones (opcional)</label>' +
       '  <textarea id="rsvNotas" rows="2"></textarea></div>' +
       '<label class="rsv-consent"><input type="checkbox" id="rsvConsent" />' +
@@ -393,7 +396,9 @@
     if (tel.replace(/\D/g, '').length < 9) {
       marcarError('rsvTel', 'Mínimo 9 cifras.'); ok = false;
     }
-    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    if (!email) {
+      marcarError('rsvEmail', 'Necesitamos el correo para enviarte la confirmación.'); ok = false;
+    } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       marcarError('rsvEmail', 'Ese correo no parece válido.'); ok = false;
     }
     if (!$('#rsvConsent').checked) {
@@ -413,7 +418,7 @@
       body: JSON.stringify({
         p_nombre: nombre,
         p_telefono: tel,
-        p_email: email || null,
+        p_email: email,
         p_personas: st.personas,
         p_fecha: st.fecha,
         p_hora: st.hora + ':00',

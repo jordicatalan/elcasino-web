@@ -63,6 +63,25 @@ function reciente(marca: string | null): boolean {
 
 /* ---------- plantilla ---------- */
 
+// La cabecera de la marca. Gmail, Outlook y compañía bloquean las imágenes
+// hasta que el lector las acepta, así que el texto alternativo va estilado:
+// si el logo no carga, se lee "El Casino" en blanco sobre el fondo oscuro,
+// no el enlace roto azul minúsculo de siempre.
+//
+// Sin URL_SITIO configurada no hay dirección pública desde la que servir el
+// logo, y entonces se vuelve al rótulo de texto.
+function marca(): string {
+  if (!ENV.sitio) {
+    return `<div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;` +
+           `color:#ffffff;letter-spacing:.02em;">El Casino</div>`;
+  }
+  return `<img src="${ENV.sitio}/assets/logo/logo-casino.png" alt="El Casino"
+       width="180" height="51"
+       style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;
+              width:180px;height:auto;max-width:100%;
+              font-family:Georgia,'Times New Roman',serif;font-size:26px;color:#ffffff;" />`;
+}
+
 function envoltorio(titulo: string, cuerpo: string): string {
   // Tablas y estilos en línea: es lo único que respetan todos los gestores
   // de correo. Nada de flexbox ni de hojas externas aquí.
@@ -77,9 +96,8 @@ function envoltorio(titulo: string, cuerpo: string): string {
          style="max-width:520px;background:#ffffff;border-radius:14px;overflow:hidden;
                 box-shadow:0 2px 12px rgba(26,16,8,.09);font-family:Helvetica,Arial,sans-serif;">
     <tr><td style="background:#1a1008;padding:28px 30px;text-align:center;">
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;color:#ffffff;letter-spacing:.02em;">
-        El Casino</div>
-      <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(250,244,233,.62);margin-top:6px;">
+      ${marca()}
+      <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(250,244,233,.62);margin-top:10px;">
         Vila-real</div>
     </td></tr>
     ${cuerpo}
