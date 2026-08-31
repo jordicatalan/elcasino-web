@@ -308,15 +308,130 @@
       '          style="background:var(--cream-2);color:var(--ink)">Siguiente ›</button>' +
       '  <button type="button" class="pa-btn pa-btn--peq" id="paHoy">Hoy</button>' +
       '  <div class="pa-dia__sep"></div>' +
+      '  <button type="button" class="pa-btn pa-btn--peq" id="paNuevaBtn">+ Apuntar reserva</button>' +
       '</div>' +
+      '<div id="paNueva"></div>' +
       '<div id="paRes"></div>';
 
     $('#paFecha').addEventListener('change', function () { fechaVista = this.value; cargarReservas(); });
     $('#paAyer').addEventListener('click',   function () { fechaVista = sumarDias(fechaVista, -1); vistaReservas(); });
     $('#paManana').addEventListener('click', function () { fechaVista = sumarDias(fechaVista,  1); vistaReservas(); });
     $('#paHoy').addEventListener('click',    function () { fechaVista = hoyISO(); vistaReservas(); });
+    $('#paNuevaBtn').addEventListener('click', alternarNueva);
 
     cargarReservas();
+  }
+
+  /* ---------- apuntar una reserva a mano (teléfono, mostrador) ---------- */
+
+  var ERRORES_ALTA = {
+    no_autorizado:     'Tu cuenta no tiene permiso para apuntar reservas.',
+    nombre_invalido:   'Escribe al menos el nombre.',
+    telefono_invalido: 'El teléfono necesita 9 cifras como mínimo.',
+    email_invalido:    'Ese correo no parece válido. Puedes dejarlo vacío.',
+    personas_invalido: 'El número de comensales tiene que estar entre 1 y 30.'
+  };
+
+  function alternarNueva() {
+    var c = $('#paNueva');
+    if (c.innerHTML) { c.innerHTML = ''; return; }
+
+    c.innerHTML =
+      '<div class="pa-caja">' +
+      '  <h2>Apuntar una reserva</h2>' +
+      '  <p class="pa-caja__ayuda">Para las que llegan por teléfono o en el mostrador. ' +
+      '     Apuntarlas aquí mantiene el aforo al día y evita que la web dé por libre ' +
+      '     una mesa que ya está comprometida.</p>' +
+      '  <div id="pnErr"></div>' +
+      '  <div class="pa-fila">' +
+      '    <div class="pa-campo"><label for="pnNombre">Nombre *</label>' +
+      '      <input type="text" id="pnNombre" autocomplete="off" /></div>' +
+      '    <div class="pa-campo"><label for="pnTel">Teléfono *</label>' +
+      '      <input type="tel" id="pnTel" autocomplete="off" /></div>' +
+      '  </div>' +
+      '  <div class="pa-fila">' +
+      '    <div class="pa-campo"><label for="pnFecha">Día *</label>' +
+      '      <input type="date" id="pnFecha" value="' + fechaVista + '" /></div>' +
+      '    <div class="pa-campo"><label for="pnHora">Hora *</label>' +
+      '      <input type="time" id="pnHora" step="300" /></div>' +
+      '    <div class="pa-campo"><label for="pnPersonas">Comensales *</label>' +
+      '      <input type="number" id="pnPersonas" min="1" max="30" value="2" /></div>' +
+      '  </div>' +
+      '  <div class="pa-campo"><label for="pnEmail">Correo (si lo dan)</label>' +
+      '    <input type="email" id="pnEmail" autocomplete="off" ' +
+      '           placeholder="Si lo pones, se le manda la confirmación" /></div>' +
+      '  <div class="pa-campo"><label for="pnNotas">Notas</label>' +
+      '    <input type="text" id="pnNotas" placeholder="Alergias, trona, cumpleaños…" /></div>' +
+      '  <div class="pa-acciones">' +
+      '    <button type="button" class="pa-btn" id="pnGuardar">Apuntar</button>' +
+      '    <button type="button" class="pa-btn pa-btn--gris" id="pnCancelar">Descartar</button>' +
+      '  </div>' +
+      '</div>';
+
+    $('#pnGuardar').addEventListener('click', function () { guardarNueva(false); });
+    $('#pnCancelar').addEventListener('click', function () { c.innerHTML = ''; });
+    $('#pnNombre').focus();
+  }
+
+  function guardarNueva(forzar) {
+    var datos = {
+      p_nombre:   $('#pnNombre').value.trim(),
+      p_telefono: $('#pnTel').value.trim(),
+      p_email:    $('#pnEmail').value.trim() || null,
+      p_personas: parseInt($('#pnPersonas').value, 10),
+      p_fecha:    $('#pnFecha').value,
+      p_hora:     $('#pnHora').value,
+      p_notas:    $('#pnNotas').value.trim() || null,
+      p_forzar:   !!forzar
+    };
+
+    if (!datos.p_nombre)  { aviso('#pnErr', 'mal', 'Falta el nombre.'); return; }
+    if (!datos.p_telefono){ aviso('#pnErr', 'mal', 'Falta el teléfono.'); return; }
+    if (!datos.p_fecha || !datos.p_hora) { aviso('#pnErr', 'mal', 'Falta el día o la hora.'); return; }
+
+    var b = $('#pnGuardar');
+    b.disabled = true; b.textContent = 'Apuntando…';
+
+    pet('/rest/v1/rpc/crear_reserva_personal', { metodo: 'POST', cuerpo: datos })
+      .then(function (res) {
+        b.disabled = false; b.textContent = 'Apuntar';
+
+        if (res && res.ok) {
+          fechaVista = datos.p_fecha;
+          vistaReservas();
+          return;
+        }
+
+        // El aforo y el horario no bloquean al personal: se avisa y se decide.
+        // En una sala real se aprietan mesas, y si el panel no lo permite
+        // se deja de usar y se vuelve a la libreta.
+        if (res && res.error === 'sin_aforo') {
+          dialogo({
+            titulo: 'Ese turno ya está lleno',
+            texto: 'Según el aforo configurado solo quedan ' + (res.libres || 0) +
+                   ' plazas en esa franja. ¿La apuntas igualmente?',
+            aceptar: 'Sí, apuntarla', cancelar: 'No, dejarlo', peligro: true
+          }).then(function (ok) { if (ok) guardarNueva(true); });
+          return;
+        }
+        if (res && res.error === 'fuera_de_horario') {
+          dialogo({
+            titulo: 'Fuera del horario de reservas',
+            texto: 'A esa hora no hay servicio configurado, así que no se puede ' +
+                   'comprobar el aforo. ¿La apuntas de todos modos?',
+            aceptar: 'Sí, apuntarla', cancelar: 'No, dejarlo'
+          }).then(function (ok) { if (ok) guardarNueva(true); });
+          return;
+        }
+
+        aviso('#pnErr', 'mal', ERRORES_ALTA[res && res.error] || 'No se ha podido apuntar.');
+      })
+      .catch(function (e) {
+        b.disabled = false; b.textContent = 'Apuntar';
+        if (e.message !== 'sesion_caducada') {
+          aviso('#pnErr', 'mal', 'No se ha podido conectar. Inténtalo otra vez.');
+        }
+      });
   }
 
   function cargarReservas() {
@@ -345,14 +460,9 @@
       '       <div class="pa-dato__t">Canceladas</div></div>' +
       '</div>';
 
-    if (!lista.length) {
-      $('#paRes').innerHTML = cab +
-        '<div class="pa-vacio"><strong>Ningún apunte para este día</strong>' +
-        'Cuando alguien reserve, aparecerá aquí.</div>';
-      return;
-    }
-
-    // Las 18:00 separan los dos servicios, igual que en la web
+    // Las 18:00 separan los dos servicios, igual que en la web.
+    // Los dos se pintan siempre, aunque estén vacíos: leer "Cenas · sin reservas"
+    // despeja la duda de si no ha reservado nadie o de si falta algo por cargar.
     var comidas = lista.filter(function (r) { return hhmm(r.hora) <  '18:00'; });
     var cenas   = lista.filter(function (r) { return hhmm(r.hora) >= '18:00'; });
 
@@ -364,15 +474,22 @@
   }
 
   // Un servicio (comidas o cenas) con su encabezado y su recuento propio.
-  // Si ese día no hay ninguno de los dos, ni se pinta el título.
   function servicio(titulo, filas) {
-    if (!filas.length) return '';
     var vivas = filas.filter(function (r) { return r.estado === 'confirmada'; });
     var com   = vivas.reduce(function (s, r) { return s + r.num_personas; }, 0);
-    return '<h3 class="pa-servicio">' + titulo +
-           '<span>' + vivas.length + (vivas.length === 1 ? ' reserva' : ' reservas') +
-           ' · ' + com + (com === 1 ? ' comensal' : ' comensales') + '</span></h3>' +
-           '<div class="pa-lista">' + filas.map(tarjeta).join('') + '</div>';
+
+    var encabezado = '<h3 class="pa-servicio">' + titulo + '<span>' +
+      (vivas.length
+        ? vivas.length + (vivas.length === 1 ? ' reserva' : ' reservas') +
+          ' · ' + com + (com === 1 ? ' comensal' : ' comensales')
+        : 'Sin reservas') +
+      '</span></h3>';
+
+    if (!filas.length) {
+      return encabezado + '<p class="pa-servicio-vacio">Todavía no hay ninguna reserva ' +
+             'para este servicio.</p>';
+    }
+    return encabezado + '<div class="pa-lista">' + filas.map(tarjeta).join('') + '</div>';
   }
 
   function tarjeta(r) {

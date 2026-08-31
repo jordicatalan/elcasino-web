@@ -114,10 +114,10 @@ create policy "personal edita franjas"
   on public.franjas_horario for all to authenticated
   using (public.es_personal()) with check (public.es_personal());
 
+-- Los bloqueos NO se leen públicamente: el motivo del cierre es interno.
+-- El calendario de la web usa la vista bloqueos_publicos (sección 7).
 drop policy if exists "todos leen bloqueos"     on public.bloqueos;
 drop policy if exists "personal edita bloqueos" on public.bloqueos;
-create policy "todos leen bloqueos"
-  on public.bloqueos for select to anon, authenticated using (true);
 create policy "personal edita bloqueos"
   on public.bloqueos for all to authenticated
   using (public.es_personal()) with check (public.es_personal());
@@ -141,7 +141,9 @@ set search_path = public
 as $func$
 declare
   v_slot       int := coalesce((select valor::int from config where clave = 'slot_min'), 30);
-  v_antelacion int := coalesce((select valor::int from config where clave = 'antelacion_min_horas'), 2);
+  -- En minutos, no en horas: así se puede permitir reservar para dentro de media
+  -- hora, que es lo normal en un bar donde la gente decide sobre la marcha.
+  v_antelacion int := coalesce((select valor::int from config where clave = 'antelacion_min_minutos'), 30);
   v_dias_max   int := coalesce((select valor::int from config where clave = 'dias_max_vista'), 60);
 begin
   -- Fuera del rango permitido: no se ofrece nada
@@ -174,7 +176,7 @@ begin
            s.inicio + make_interval(mins => s.duracion_min) as fin
     from slots s
     -- Respeta la antelación mínima (hora española)
-    where (s.inicio at time zone 'Europe/Madrid') >= now() + make_interval(hours => v_antelacion)
+    where (s.inicio at time zone 'Europe/Madrid') >= now() + make_interval(mins => v_antelacion)
       -- Descarta tramos bloqueados puntualmente
       and not exists (
         select 1 from bloqueos b
@@ -311,6 +313,110 @@ revoke all on function public.huecos_disponibles(date, int) from public;
 revoke all on function public.crear_reserva(text, text, text, int, date, time, text) from public;
 grant execute on function public.huecos_disponibles(date, int) to anon, authenticated;
 grant execute on function public.crear_reserva(text, text, text, int, date, time, text) to anon, authenticated;
+
+
+-- ---------- 4-bis. ALTA MANUAL DESDE EL PANEL ----------
+-- En un bar de pueblo la mayoría de las reservas siguen entrando por teléfono.
+-- Si esas no se apuntan aquí, el aforo que calcula la web es mentira y acabará
+-- aceptando mesas que ya están dadas.
+--
+-- Las reglas son distintas a las de la web, y es a propósito:
+--   · el correo es opcional, porque por teléfono mucha gente no lo da
+--   · no hay antelación mínima: si llaman a las 13:00 para las 13:30, vale
+--   · se puede forzar por encima del aforo. En una sala real se aprietan mesas,
+--     y si el sistema se lo impide, el jefe vuelve a la libreta y aquí se acabó
+--     todo lo demás.
+create or replace function public.crear_reserva_personal(
+  p_nombre   text,
+  p_telefono text,
+  p_email    text,
+  p_personas int,
+  p_fecha    date,
+  p_hora     time,
+  p_notas    text default null,
+  p_forzar   boolean default false
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $func$
+declare
+  v_franja   record;
+  v_ocupadas int;
+  v_id       uuid;
+begin
+  -- Aunque la función esté concedida a cualquier autenticado, solo actúa
+  -- para quien figure en la lista blanca de personal.
+  if not public.es_personal() then
+    return jsonb_build_object('ok', false, 'error', 'no_autorizado');
+  end if;
+
+  if p_nombre is null or length(btrim(p_nombre)) < 2 then
+    return jsonb_build_object('ok', false, 'error', 'nombre_invalido');
+  end if;
+
+  if p_telefono is null or length(regexp_replace(p_telefono, '[^0-9]', '', 'g')) < 9 then
+    return jsonb_build_object('ok', false, 'error', 'telefono_invalido');
+  end if;
+
+  -- Aquí el correo SÍ puede ir vacío, al contrario que en la web
+  if p_email is not null and btrim(p_email) <> ''
+     and p_email !~ '^[^@[:space:]]+@[^@[:space:]]+[.][^@[:space:]]+$' then
+    return jsonb_build_object('ok', false, 'error', 'email_invalido');
+  end if;
+
+  if p_personas is null or p_personas < 1 or p_personas > 30 then
+    return jsonb_build_object('ok', false, 'error', 'personas_invalido');
+  end if;
+
+  perform pg_advisory_xact_lock(hashtextextended(p_fecha::text || p_hora::text, 0));
+
+  select f.* into v_franja
+  from franjas_horario f
+  where f.activa
+    and f.dia_semana = extract(dow from p_fecha)::int
+    and p_hora between f.hora_inicio and f.hora_fin
+  limit 1;
+
+  if not found then
+    -- Sin franja no hay aforo contra el que comparar. Se avisa, pero si el
+    -- personal insiste (una comida privada un lunes) se deja pasar.
+    if not p_forzar then
+      return jsonb_build_object('ok', false, 'error', 'fuera_de_horario');
+    end if;
+  else
+    select coalesce(sum(r.num_personas), 0)::int into v_ocupadas
+    from reservas r
+    where r.fecha = p_fecha
+      and r.estado = 'confirmada'
+      and (p_fecha + r.hora) < (p_fecha + p_hora + make_interval(mins => v_franja.duracion_min))
+      and (p_fecha + r.hora + make_interval(mins => v_franja.duracion_min)) > (p_fecha + p_hora);
+
+    if v_ocupadas + p_personas > v_franja.aforo_maximo and not p_forzar then
+      return jsonb_build_object('ok', false, 'error', 'sin_aforo',
+                                'libres', greatest(v_franja.aforo_maximo - v_ocupadas, 0));
+    end if;
+  end if;
+
+  insert into reservas (nombre, telefono, email, num_personas, fecha, hora, notas)
+  values (btrim(p_nombre),
+          btrim(p_telefono),
+          nullif(btrim(coalesce(p_email, '')), ''),
+          p_personas,
+          p_fecha,
+          p_hora,
+          nullif(btrim(coalesce(p_notas, '')), ''))
+  returning id into v_id;
+
+  return jsonb_build_object('ok', true, 'id', v_id);
+end;
+$func$;
+
+revoke all on function
+  public.crear_reserva_personal(text, text, text, int, date, time, text, boolean) from public;
+grant execute on function
+  public.crear_reserva_personal(text, text, text, int, date, time, text, boolean) to authenticated;
 
 
 -- ---------- 5. CANCELAR DESDE EL CORREO ----------
@@ -497,7 +603,7 @@ create trigger tr_avisar_correo
 -- ---------- 9. DATOS INICIALES ----------
 insert into public.config (clave, valor) values
   ('slot_min',             '30'),
-  ('antelacion_min_horas', '2'),
+  ('antelacion_min_minutos', '30'),
   ('dias_max_vista',       '60'),
   ('nombre_negocio',       'El Casino Vila-real'),
   ('telefono_negocio',     '689229479'),
