@@ -289,28 +289,6 @@
           }
         }
       ]
-    },
-    {
-      "nota": "hola",
-      "traducciones": {
-        "nombre_va": "",
-        "nombre_en": "",
-        "nota_va": "",
-        "nota_en": ""
-      },
-      "nombre": "prueba",
-      "platos": [
-        {
-          "precio": "500,00 €",
-          "traducciones": {
-            "nombre_va": "",
-            "nombre_en": "",
-            "precio_va": "",
-            "precio_en": ""
-          },
-          "nombre": "Prueba plato categoria prueba"
-        }
-      ]
     }
   ]
 }
