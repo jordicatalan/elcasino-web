@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>Nueva contraseña · El Casino Vila-real</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#1a1008" />
+
+  <link rel="icon" href="assets/logo/logo-instagram.jpg" type="image/jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/reservas-admin.css?v=7" />
+</head>
+
+<body>
+  <div class="pa-login">
+    <div class="pa-login__caja">
+      <div class="pa-login__cab">
+        <img class="pa-login__naranja" src="assets/logo/naranja-marca.png" alt="" aria-hidden="true" />
+        <img class="pa-logo" src="assets/logo/logo-casino.png" alt="El Casino Vila-real" />
+        <p>Nueva contraseña</p>
+      </div>
+      <div class="pa-login__cuerpo" id="cuerpo" aria-live="polite">
+        <div class="pa-cargando"><div class="pa-spin" role="status" aria-label="Cargando"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var CFG = {
+      url:     'https://zdxcwrwqlrvmsokzoocp.supabase.co',
+      anonKey: 'sb_publishable_rpMkEygmQYuVE8QcgON7_g_Yv_JE3kJ'
+    };
+
+    var MINIMO = 10;
+    var $cuerpo = document.getElementById('cuerpo');
+
+    function esc(x) {
+      return String(x == null ? '' : x)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function aviso(tipo, texto) {
+      var e = document.getElementById('err');
+      if (e) e.innerHTML = '<div class="pa-aviso pa-aviso--' + tipo + '">' + esc(texto) + '</div>';
+    }
+
+    // Supabase manda el testigo en el fragmento de la URL (tras la #), que nunca
+    // viaja al servidor. Se lee y se borra de la barra de direcciones para que no
+    // quede en el historial ni se comparta sin querer al copiar el enlace.
+    function tomarTestigo() {
+      var h = location.hash.replace(/^#/, '');
+      if (!h) return null;
+      var p = new URLSearchParams(h);
+      var t = p.get('access_token');
+      if (t) history.replaceState(null, '', location.pathname);
+      return t || null;
+    }
+
+    function botonVolver(texto) {
+      return '<a class="pa-btn pa-btn--bloque" href="reservas-admin.html" ' +
+             'style="display:block;box-sizing:border-box;text-align:center;text-decoration:none">' +
+             esc(texto) + '</a>';
+    }
+
+    function fallo(titulo, texto) {
+      $cuerpo.innerHTML =
+        '<h1 style="font-family:var(--serif);font-size:1.3rem;margin:0 0 .6rem">' + esc(titulo) + '</h1>' +
+        '<p style="color:var(--ink-soft);margin:0 0 1.2rem">' + esc(texto) + '</p>' +
+        botonVolver('Volver al panel');
+    }
+
+    function hecho() {
+      $cuerpo.innerHTML =
+        '<div style="text-align:center">' +
+        '  <div style="font-size:2.4rem;line-height:1;color:#1f7a44" aria-hidden="true">✓</div>' +
+        '  <h1 style="font-family:var(--serif);font-size:1.3rem;margin:.5rem 0 .6rem">Contraseña cambiada</h1>' +
+        '  <p style="color:var(--ink-soft);margin:0 0 1.2rem">Ya puedes entrar al panel con la nueva.</p>' +
+        '</div>' +
+        botonVolver('Entrar al panel');
+    }
+
+    function formulario(testigo) {
+      $cuerpo.innerHTML =
+        '<div id="err"></div>' +
+        '<div class="pa-campo">' +
+        '  <label for="c1">Nueva contraseña</label>' +
+        '  <input type="password" id="c1" autocomplete="new-password" />' +
+        '</div>' +
+        '<div class="pa-campo">' +
+        '  <label for="c2">Repítela</label>' +
+        '  <input type="password" id="c2" autocomplete="new-password" />' +
+        '</div>' +
+        '<p style="color:var(--ink-soft);font-size:.84rem;margin:0 0 1rem">' +
+        'Mínimo ' + MINIMO + ' caracteres. Detrás de esta contraseña están los datos ' +
+        'personales de vuestros clientes, así que no reutilices una de otro sitio.</p>' +
+        '<button type="button" class="pa-btn pa-btn--bloque" id="guardar">Guardar contraseña</button>';
+
+      document.getElementById('c1').focus();
+
+      document.getElementById('guardar').addEventListener('click', function () {
+        var c1 = document.getElementById('c1').value;
+        var c2 = document.getElementById('c2').value;
+
+        if (c1.length < MINIMO) {
+          aviso('mal', 'La contraseña necesita al menos ' + MINIMO + ' caracteres.'); return;
+        }
+        if (c1 !== c2) { aviso('mal', 'Las dos contraseñas no coinciden.'); return; }
+
+        var b = this;
+        b.disabled = true; b.textContent = 'Guardando…';
+
+        fetch(CFG.url + '/auth/v1/user', {
+          method: 'PUT',
+          headers: {
+            'apikey': CFG.anonKey,
+            'Authorization': 'Bearer ' + testigo,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password: c1 })
+        }).then(function (r) {
+          return r.json().catch(function () { return {}; })
+                  .then(function (d) { return { ok: r.ok, d: d }; });
+        }).then(function (r) {
+          if (r.ok) { hecho(); return; }
+          b.disabled = false; b.textContent = 'Guardar contraseña';
+          var clave = r.d && (r.d.error_code || r.d.error);
+          if (clave === 'same_password') {
+            aviso('mal', 'Esa es la contraseña que ya tenías. Elige otra distinta.');
+          } else if (clave === 'weak_password') {
+            aviso('mal', 'Esa contraseña es demasiado débil. Prueba con una más larga.');
+          } else {
+            aviso('mal', (r.d && r.d.msg) ||
+                  'No se ha podido cambiar. El enlace puede haber caducado: pide otro desde el panel.');
+          }
+        }).catch(function () {
+          b.disabled = false; b.textContent = 'Guardar contraseña';
+          aviso('mal', 'No se ha podido conectar. Revisa la conexión.');
+        });
+      });
+    }
+
+    /* ---------- arranque ---------- */
+    var testigo = tomarTestigo();
+    if (!testigo) {
+      fallo('Enlace no válido o caducado',
+            'Los enlaces de recuperación caducan al poco de enviarse y solo sirven una vez. ' +
+            'Vuelve al panel y pide uno nuevo.');
+    } else {
+      formulario(testigo);
+    }
+  })();
+  </script>
+</body>
+</html>

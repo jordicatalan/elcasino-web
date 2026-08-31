@@ -3,6 +3,7 @@ Allow: /
 Disallow: /admin/
 Disallow: /reservas-admin.html
 Disallow: /cancelar.html
+Disallow: /restablecer.html
 Disallow: /content/
 
 Sitemap: https://elcasinovila-real.es/sitemap.xml

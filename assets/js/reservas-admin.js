@@ -112,12 +112,52 @@
       }).catch(function () { return false; });
   }
 
+  // Decir siempre "contraseña incorrecta" es cómodo de programar y pésimo de usar:
+  // si lo que pasa es que has agotado los intentos, te tiras media hora repitiendo
+  // una contraseña que era correcta. Cada causa merece su mensaje.
+  var ERRORES_ACCESO = {
+    invalid_credentials:        'Correo o contraseña incorrectos.',
+    email_not_confirmed:        'La cuenta existe pero está sin confirmar. Hay que confirmarla desde Supabase → Authentication → Users.',
+    user_not_found:             'No hay ninguna cuenta con ese correo.',
+    validation_failed:          'Revisa que el correo esté bien escrito.',
+    over_request_rate_limit:    'Demasiados intentos seguidos: el acceso queda bloqueado unos minutos. Espera un poco y vuelve a probar con calma.',
+    over_email_send_rate_limit: 'Se han pedido demasiados correos seguidos. Espera unos minutos.'
+  };
+
+  function textoErrorAcceso(estado, datos) {
+    if (estado === 429) return ERRORES_ACCESO.over_request_rate_limit;
+    var clave = datos && (datos.error_code || datos.error);
+    return ERRORES_ACCESO[clave] ||
+           (datos && datos.msg) ||
+           'No se ha podido entrar. Inténtalo de nuevo en un momento.';
+  }
+
   function entrar(email, clave) {
     return fetch(CFG.url + '/auth/v1/token?grant_type=password', {
       method: 'POST',
       headers: { 'apikey': CFG.anonKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, password: clave })
-    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); });
+    }).then(function (r) {
+      return r.json()
+        .catch(function () { return {}; })
+        .then(function (d) { return { ok: r.ok, estado: r.status, d: d }; });
+    });
+  }
+
+  // Pide a Supabase el correo con el enlace para poner una contraseña nueva.
+  // La dirección de vuelta debe estar dada de alta en
+  // Supabase → Authentication → URL Configuration → Redirect URLs
+  function pedirRecuperacion(email) {
+    var vuelta = location.origin + location.pathname.replace(/[^/]*$/, '') + 'restablecer.html';
+    return fetch(CFG.url + '/auth/v1/recover?redirect_to=' + encodeURIComponent(vuelta), {
+      method: 'POST',
+      headers: { 'apikey': CFG.anonKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    }).then(function (r) {
+      return r.json()
+        .catch(function () { return {}; })
+        .then(function (d) { return { ok: r.ok, estado: r.status, d: d }; });
+    });
   }
 
   function salir() {
@@ -153,6 +193,7 @@
       '      <input type="password" id="paClave" autocomplete="current-password" required />' +
       '    </div>' +
       '    <button type="submit" class="pa-btn pa-btn--bloque" id="paEntrar">Entrar</button>' +
+      '    <button type="button" class="pa-enlace" id="paOlvide">He olvidado la contraseña</button>' +
       '  </form>' +
       '</div></div>';
 
@@ -166,7 +207,7 @@
       b.disabled = true; b.textContent = 'Entrando…';
       entrar(email, clave).then(function (r) {
         if (!r.ok || !r.d.access_token) {
-          aviso('#paErr', 'mal', 'Correo o contraseña incorrectos.');
+          aviso('#paErr', 'mal', textoErrorAcceso(r.estado, r.d));
           b.disabled = false; b.textContent = 'Entrar';
           return;
         }
@@ -176,6 +217,28 @@
       }).catch(function () {
         aviso('#paErr', 'mal', 'No se ha podido conectar. Revisa la conexión.');
         b.disabled = false; b.textContent = 'Entrar';
+      });
+    });
+
+    $('#paOlvide').addEventListener('click', function () {
+      var email = $('#paEmail').value.trim();
+      if (!email) {
+        aviso('#paErr', 'info', 'Escribe arriba tu correo y vuelve a pulsar aquí.');
+        $('#paEmail').focus();
+        return;
+      }
+      var b = this;
+      b.disabled = true; b.textContent = 'Enviando…';
+      pedirRecuperacion(email).then(function (r) {
+        b.disabled = false; b.textContent = 'He olvidado la contraseña';
+        if (!r.ok) { aviso('#paErr', 'mal', textoErrorAcceso(r.estado, r.d)); return; }
+        // Supabase responde igual exista o no la cuenta, para no revelar
+        // qué correos están dados de alta. El mensaje lo refleja.
+        aviso('#paErr', 'ok', 'Si ese correo tiene cuenta, te llegará un enlace para ' +
+              'poner una contraseña nueva. Revisa también la carpeta de spam.');
+      }).catch(function () {
+        b.disabled = false; b.textContent = 'He olvidado la contraseña';
+        aviso('#paErr', 'mal', 'No se ha podido conectar. Revisa la conexión.');
       });
     });
   }

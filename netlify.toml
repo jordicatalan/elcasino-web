@@ -32,3 +32,10 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
     Referrer-Policy = "no-referrer"
+
+# La pagina de nueva contrasena lleva un testigo en la URL
+[[headers]]
+  for = "/restablecer.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"

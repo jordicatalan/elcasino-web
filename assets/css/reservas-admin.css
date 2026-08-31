@@ -282,3 +282,21 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; line-height
   color: var(--ink-soft);
   font-size: .92rem;
 }
+
+/* Enlace de texto dentro de un formulario (olvido de contrasena) */
+.pa-enlace {
+  display: block;
+  width: 100%;
+  margin-top: .9rem;
+  padding: .4rem;
+  background: none;
+  border: 0;
+  color: var(--ink-soft);
+  font-size: .86rem;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+  transition: color .2s;
+}
+.pa-enlace:hover:not(:disabled) { color: var(--accent-ink); }
+.pa-enlace:disabled { opacity: .55; cursor: not-allowed; }
