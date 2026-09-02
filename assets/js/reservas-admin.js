@@ -826,6 +826,15 @@
           '<button type="button" class="pa-btn" id="paGuardarHor" style="margin-top:1.2rem">Guardar cambios</button>';
 
         $('#paGuardarHor').addEventListener('click', guardarFranjas);
+
+        // La fila se atenúa según la casilla, no según lo que había al cargar.
+        // Si no, marcas "Abierto" y el turno sigue viéndose gris hasta guardar,
+        // y parece que no ha hecho caso.
+        $$('#paHorLista [data-c="activa"]').forEach(function (c) {
+          c.addEventListener('change', function () {
+            c.closest('tr').classList.toggle('es-inactiva', !c.checked);
+          });
+        });
       })
       .catch(function (e) {
         if (e.message === 'sesion_caducada') return;

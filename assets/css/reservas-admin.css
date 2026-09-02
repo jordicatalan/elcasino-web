@@ -185,7 +185,10 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; line-height
   text-transform: uppercase; color: var(--ink-soft);
 }
 .pa-tabla td input[type="number"] { width: 5.2rem; padding: .4em .5em; border: 1px solid var(--border); border-radius: 8px; }
-.pa-tabla tr.es-inactiva td { opacity: .45; }
+/* Turno cerrado: atenuado pero legible. Los campos siguen siendo editables,
+   asi que dejarlos casi invisibles enganaria sobre lo que se puede tocar. */
+.pa-tabla tr.es-inactiva td { opacity: .62; }
+.pa-tabla tr.es-inactiva td:first-child { opacity: 1; color: var(--ink-soft); }
 .pa-scroll { overflow-x: auto; }
 
 /* ---------- Avisos ---------- */
