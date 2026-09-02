@@ -52,6 +52,29 @@
     var d = desdeISO(s); d.setDate(d.getDate() + n); return iso(d);
   }
 
+  function diasEntre(desde, hasta) {
+    return Math.round((desdeISO(hasta) - desdeISO(desde)) / 86400000) + 1;
+  }
+
+  // "Del 10 al 30 de septiembre de 2026" en vez de repetir mes y año dos veces.
+  // Se lee como lo diría una persona, no como dos fechas pegadas.
+  function textoPeriodo(desde, hasta) {
+    var a = desdeISO(desde), b = desdeISO(hasta);
+    var mismoAnio = a.getFullYear() === b.getFullYear();
+    var mismoMes  = mismoAnio && a.getMonth() === b.getMonth();
+
+    if (mismoMes) {
+      return 'Del ' + a.getDate() + ' al ' + b.getDate() +
+             ' de ' + MESES[b.getMonth()] + ' de ' + b.getFullYear();
+    }
+    if (mismoAnio) {
+      return 'Del ' + a.getDate() + ' de ' + MESES[a.getMonth()] +
+             ' al ' + b.getDate() + ' de ' + MESES[b.getMonth()] + ' de ' + b.getFullYear();
+    }
+    return 'Del ' + a.getDate() + ' de ' + MESES[a.getMonth()] + ' de ' + a.getFullYear() +
+           ' al ' + b.getDate() + ' de ' + MESES[b.getMonth()] + ' de ' + b.getFullYear();
+  }
+
   /* ---------- sesión ---------- */
 
   function leerSesion() {
@@ -681,13 +704,19 @@
           '<div class="pa-scroll"><table class="pa-tabla"><thead><tr>' +
           '<th>Días</th><th>Tramo</th><th>Motivo</th><th></th></tr></thead><tbody>' +
           l.map(function (b) {
+            var esPeriodo = b.fecha_fin && b.fecha_fin !== b.fecha;
+
+            // Un martes suelto y tres semanas de vacaciones son cosas muy
+            // distintas: la etiqueta con los días lo dice de un vistazo.
+            var cuando = esPeriodo
+              ? '<strong>' + esc(textoPeriodo(b.fecha, b.fecha_fin)) + '</strong> ' +
+                '<span class="pa-etiq pa-etiq--dias">' + diasEntre(b.fecha, b.fecha_fin) + ' días</span>'
+              : '<strong>' + esc(textoFecha(b.fecha)) + '</strong>';
+
             var tramo = b.hora_inicio
-              ? esc(hhmm(b.hora_inicio)) + ' – ' + esc(hhmm(b.hora_fin))
-              : '<strong>Día entero</strong>';
-            var cuando = (b.fecha_fin && b.fecha_fin !== b.fecha)
-              ? esc(textoFecha(b.fecha)) + '<br /><span style="color:var(--ink-soft)">hasta ' +
-                esc(textoFecha(b.fecha_fin)) + '</span>'
-              : esc(textoFecha(b.fecha));
+              ? '<strong>' + esc(hhmm(b.hora_inicio)) + ' – ' + esc(hhmm(b.hora_fin)) + '</strong>'
+              : '<strong>' + (esPeriodo ? 'Días completos' : 'Día completo') + '</strong>';
+
             return '<tr' + (b.id === bloqueoEditando ? ' style="background:var(--cream-2)"' : '') + '>' +
                    '<td>' + cuando + '</td><td>' + tramo + '</td>' +
                    '<td>' + esc(b.motivo || '—') + '</td>' +

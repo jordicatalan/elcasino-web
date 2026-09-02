@@ -303,3 +303,13 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; line-height
 }
 .pa-enlace:hover:not(:disabled) { color: var(--accent-ink); }
 .pa-enlace:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Cuantos dias dura un cierre, para distinguir de un vistazo un dia suelto
+   de un periodo de vacaciones */
+.pa-etiq--dias {
+  background: var(--accent-ink);
+  color: #fff;
+  margin-left: .3rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
