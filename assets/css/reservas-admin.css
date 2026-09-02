@@ -313,3 +313,58 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; line-height
   vertical-align: middle;
   white-space: nowrap;
 }
+
+/* ============================================================
+   MOVIL
+   El panel se usa desde la barra, con el movil en la mano. Estas
+   reglas no son cosmeticas: sin ellas los campos se pisan y la
+   cabecera monta el correo sobre el rotulo.
+   ============================================================ */
+
+/* Un hijo de flex no encoge por debajo de su contenido salvo que se le
+   diga. Sin esto, el correo largo empuja y se solapa con "RESERVAS". */
+.pa-top__marca > * { min-width: 0; }
+.pa-quien { flex: 0 1 auto; }
+
+/* Safari en iOS da a los input de fecha y hora una anchura minima propia
+   que se sale de su celda. Esto los obliga a caber. */
+.pa-campo input, .pa-campo select, .pa-campo textarea { min-width: 0; max-width: 100%; }
+.pa-tabla input { min-width: 0; max-width: 100%; }
+
+@media (max-width: 640px) {
+  /* Cabecera: se queda el logo y el boton de salir. El rotulo y el correo
+     sobran en 375 px, y son justo lo que se montaba. */
+  .pa-top__marca span,
+  .pa-quien { display: none; }
+
+  /* Un campo por linea: dos columnas en 375 px dejan los calendarios
+     inservibles y en iOS acaban superponiendose. */
+  .pa-fila { grid-template-columns: 1fr; }
+
+  /* Barra del dia. Cuatro botones apilados son una torre de 300 px antes de
+     ver una sola reserva. Se agrupan por funcion: la fecha arriba, la
+     navegacion en una fila, y la accion principal a lo ancho abajo. */
+  /* Fila explícita además de columna: el orden del HTML no coincide con el
+     visual, y la rejilla solo avanza hacia delante. Sin decirle la fila, cada
+     botón se cae a una propia. */
+  .pa-dia { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+  .pa-dia .pa-campo    { grid-column: 1 / -1; grid-row: 1; }
+  .pa-dia__sep         { display: none; }
+  .pa-dia #paAyer      { grid-column: 1;     grid-row: 2; }
+  .pa-dia #paHoy       { grid-column: 2;     grid-row: 2; }
+  .pa-dia #paManana    { grid-column: 3;     grid-row: 2; }
+  .pa-dia #paNuevaBtn  { grid-column: 1 / -1; grid-row: 3; }
+  .pa-dia .pa-btn--peq { padding: .62em .4em; text-align: center; }
+
+  /* Las tres cifras del dia, siempre en tres columnas iguales. Con
+     auto-fit salian dos arriba y una suelta debajo. */
+  .pa-resumen { grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+  .pa-dato { padding: .8rem .6rem; text-align: center; }
+  .pa-dato__n { font-size: 1.6rem; }
+  .pa-dato__t { font-size: .58rem; letter-spacing: .08em; }
+
+  /* Botones de accion a lo ancho, sin apelotonarse */
+  .pa-acciones { flex-direction: column; align-items: stretch; }
+  .pa-acciones .pa-btn { width: 100%; }
+}
+

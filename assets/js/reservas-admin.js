@@ -667,6 +667,15 @@
       '  <p class="pa-caja__ayuda">Solo se muestran los que aún no han pasado.</p>' +
       '  <div id="paBloqLista"></div></div>';
 
+    // Al elegir el primer día, el segundo calendario arranca ahí: no tiene
+    // sentido ofrecer fechas anteriores, y así se abre por el mes correcto.
+    $('#pbFecha').addEventListener('change', function () {
+      var f = $('#pbFechaFin');
+      f.min = this.value || hoyISO();
+      if (f.value && f.value < this.value) f.value = '';
+    });
+    if ($('#pbFecha').value) $('#pbFechaFin').min = $('#pbFecha').value;
+
     $('#pbCrear').addEventListener('click', guardarBloqueo);
     if (ed) {
       $('#pbDescartar').addEventListener('click', function () {
@@ -740,6 +749,19 @@
       });
   }
 
+  // ¿Hay ya un cierre de día completo que pise estas fechas? Solo miran los de
+  // día entero: un cierre de 17:00 a 21:00 no impide cerrar ese día del todo.
+  function cierreQueSolapa(desde, hasta, excluirId) {
+    var fin = hasta || desde;
+    for (var i = 0; i < bloqueosCargados.length; i++) {
+      var b = bloqueosCargados[i];
+      if (b.id === excluirId || b.hora_inicio) continue;
+      var bFin = b.fecha_fin || b.fecha;
+      if (desde <= bFin && fin >= b.fecha) return b;
+    }
+    return null;
+  }
+
   function guardarBloqueo() {
     var fecha    = $('#pbFecha').value;
     var fechaFin = $('#pbFechaFin').value;
@@ -756,6 +778,21 @@
     }
     if (ini && fin && fin <= ini) {
       aviso('#paBloqErr', 'mal', 'La hora de fin tiene que ser posterior a la de inicio.'); return;
+    }
+
+    // Cerrar un día que ya cae dentro de unas vacaciones no hace nada, pero deja
+    // la lista con dos filas que dicen lo mismo y confunden. Mejor mandar a
+    // corregir el cierre que ya existe.
+    var choca = cierreQueSolapa(fecha, fechaFin, bloqueoEditando);
+    if (choca) {
+      var q = (choca.fecha_fin && choca.fecha_fin !== choca.fecha)
+        ? textoPeriodo(choca.fecha, choca.fecha_fin)
+        : textoFecha(choca.fecha);
+      aviso('#paBloqErr', 'mal',
+            'Esos días ya están cerrados: «' + q + '»' +
+            (choca.motivo ? ' (' + choca.motivo + ')' : '') +
+            '. Edita ese cierre en vez de crear otro encima.');
+      return;
     }
 
     var editando = bloqueoEditando;
