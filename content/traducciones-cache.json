@@ -8,5 +8,7 @@
   "va::prueba categoria": "prova categoria",
   "en::prueba categoria": "category test",
   "va::prueba plato": "prova plat",
-  "en::prueba plato": "dish test"
+  "en::prueba plato": "dish test",
+  "va::Hola": "Hola",
+  "en::Hola": "Hola"
 }

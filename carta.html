@@ -276,6 +276,21 @@
           }
         }
       ]
+    },
+    {
+      "@type": "MenuSection",
+      "name": "Prueba",
+      "hasMenuItem": [
+        {
+          "@type": "MenuItem",
+          "name": "Prueba plato categoria prueba",
+          "offers": {
+            "@type": "Offer",
+            "price": "20.00",
+            "priceCurrency": "EUR"
+          }
+        }
+      ]
     }
   ]
 }
@@ -394,6 +409,14 @@
             </ul>
           </section>
 
+          <section class="menu-cat reveal">
+            <h2 class="menu-cat__title" data-i18n="mc5">Prueba</h2>
+            <p class="carta__note" data-i18n="mc5n">Hola</p>
+            <ul class="menu-list">
+              <li class="menu-item"><span class="menu-item__name" data-i18n="mc5i0">Prueba plato categoria prueba</span><span class="menu-item__dots"></span><span class="menu-item__price">20,00&nbsp;€</span></li>
+            </ul>
+          </section>
+
         </div>
         <p class="carta__disclaimer" data-i18n="carta_disclaimer">Carta orientativa. Alérgenos e intolerancias: consulta a nuestro equipo. IVA incluido.</p>
       </div>
@@ -439,7 +462,7 @@
   </footer>
 
   <script>
-    window.CasinoMenuI18N = {"es":{"mc0":"Desayunos & almuerzos","mc0i0":"Tostada de pan de pueblo con tomate y AOVE","mc0i1":"Tostada de aguacate, huevo poché y semillas","mc0i2":"Brioche de la casa con crema de cacao, plátano y fresas","mc0i3":"Croissant artesano con café con leche","mc0i4":"Almuerzo «El Casino»: bocadillo, bebida y café","mc1":"Para compartir","mc1i0":"Tabla de quesos y frutas de temporada","mc1i1":"Tabla de embutidos ibéricos con picos","mc1i2":"Croquetas caseras de jamón (6 u.)","mc1i3":"Bravas del Casino","mc1i4":"Ensaladilla rusa con ventresca","mc2":"Arroces","mc2n":"Nuestros arroces se elaboran al momento (mínimo 2 personas). Precio por persona.","mc2i0":"Arroz senyoret con marisco","mc2i1":"Paella de marisco y alcachofa","mc2i2":"Arroz negro con sepia y alioli","mc2i3":"Fideuà de la costa","mc3":"Del mercado","mc3i0":"Crudo de lubina con tomate cherry y cítricos","mc3i1":"Pulpo a la brasa con parmentier","mc3i2":"Bacalao confitado sobre pisto","mc3i3":"Presa ibérica a la brasa con patata","mc3i4":"Pescado del día a la espalda con cebolla confitada","mc3i4p":"s/ mercado","mc4":"Dulces & cafés","mc4i0":"Coulant de chocolate con helado de vainilla","mc4i1":"Tarta de queso al horno","mc4i2":"Café de especialidad","mc4i3":"Carajillo de Baileys"},"va":{"mc0":"Esmorzars","mc0i0":"Torrada de pa de poble amb tomaca i oli d'oliva verge","mc0i1":"Torrada d'alvocat, ou poché i llavors","mc0i2":"Brioix de la casa amb crema de cacau, plàtan i maduixes","mc0i3":"Croissant artesà amb café amb llet","mc0i4":"Esmorzar «El Casino»: entrepà, beguda i café","mc1":"Per a compartir","mc1i0":"Taula de formatges i fruites de temporada","mc1i1":"Taula d'embotits ibèrics amb crostons","mc1i2":"Croquetes casolanes de pernil (6 u.)","mc1i3":"Braves del Casino","mc1i4":"Ensaladilla russa amb ventresca","mc2":"Arrossos","mc2n":"Els nostres arrossos s'elaboren al moment (mínim 2 persones). Preu per persona.","mc2i0":"Arròs senyoret amb marisc","mc2i1":"Paella de marisc i carxofa","mc2i2":"Arròs negre amb sépia i allioli","mc2i3":"Fideuà de la costa","mc3":"Del mercat","mc3i0":"Cru de llobarro amb tomaca cherry i cítrics","mc3i1":"Polp a la brasa amb parmentier","mc3i2":"Bacallà confitat sobre samfaina","mc3i3":"Presa ibèrica a la brasa amb creïlla","mc3i4":"Peix del dia a l'esquena amb ceba confitada","mc3i4p":"s/ mercat","mc4":"Dolços & cafés","mc4i0":"Coulant de xocolata amb gelat de vainilla","mc4i1":"Pastís de formatge al forn","mc4i2":"Café d'especialitat","mc4i3":"Cigaló de Baileys"},"en":{"mc0":"Breakfast & brunch","mc0i0":"Rustic bread toast with tomato and extra-virgin olive oil","mc0i1":"Avocado toast with poached egg and seeds","mc0i2":"House brioche with chocolate cream, banana and strawberries","mc0i3":"Artisan croissant with a café con leche","mc0i4":"«El Casino» brunch: sandwich, drink and coffee","mc1":"To share","mc1i0":"Cheese board with seasonal fruit","mc1i1":"Iberian charcuterie board with breadsticks","mc1i2":"Homemade ham croquettes (6 pcs)","mc1i3":"Casino-style patatas bravas","mc1i4":"Russian salad with tuna belly","mc2":"Rice dishes","mc2n":"Our rice dishes are cooked to order (min. 2 people). Price per person.","mc2i0":"«Senyoret» seafood rice","mc2i1":"Seafood and artichoke paella","mc2i2":"Black rice with cuttlefish and aioli","mc2i3":"Coastal fideuà (noodle paella)","mc3":"From the market","mc3i0":"Sea bass crudo with cherry tomato and citrus","mc3i1":"Grilled octopus with potato parmentier","mc3i2":"Confit cod over pisto ratatouille","mc3i3":"Grilled Iberian pork with potatoes","mc3i4":"Catch of the day with caramelised onion","mc3i4p":"market price","mc4":"Sweets & coffee","mc4i0":"Chocolate coulant with vanilla ice cream","mc4i1":"Baked cheesecake","mc4i2":"Specialty coffee","mc4i3":"Baileys carajillo"}};
+    window.CasinoMenuI18N = {"es":{"mc0":"Desayunos & almuerzos","mc0i0":"Tostada de pan de pueblo con tomate y AOVE","mc0i1":"Tostada de aguacate, huevo poché y semillas","mc0i2":"Brioche de la casa con crema de cacao, plátano y fresas","mc0i3":"Croissant artesano con café con leche","mc0i4":"Almuerzo «El Casino»: bocadillo, bebida y café","mc1":"Para compartir","mc1i0":"Tabla de quesos y frutas de temporada","mc1i1":"Tabla de embutidos ibéricos con picos","mc1i2":"Croquetas caseras de jamón (6 u.)","mc1i3":"Bravas del Casino","mc1i4":"Ensaladilla rusa con ventresca","mc2":"Arroces","mc2n":"Nuestros arroces se elaboran al momento (mínimo 2 personas). Precio por persona.","mc2i0":"Arroz senyoret con marisco","mc2i1":"Paella de marisco y alcachofa","mc2i2":"Arroz negro con sepia y alioli","mc2i3":"Fideuà de la costa","mc3":"Del mercado","mc3i0":"Crudo de lubina con tomate cherry y cítricos","mc3i1":"Pulpo a la brasa con parmentier","mc3i2":"Bacalao confitado sobre pisto","mc3i3":"Presa ibérica a la brasa con patata","mc3i4":"Pescado del día a la espalda con cebolla confitada","mc3i4p":"s/ mercado","mc4":"Dulces & cafés","mc4i0":"Coulant de chocolate con helado de vainilla","mc4i1":"Tarta de queso al horno","mc4i2":"Café de especialidad","mc4i3":"Carajillo de Baileys","mc5":"Prueba","mc5n":"Hola","mc5i0":"Prueba plato categoria prueba"},"va":{"mc0":"Esmorzars","mc0i0":"Torrada de pa de poble amb tomaca i oli d'oliva verge","mc0i1":"Torrada d'alvocat, ou poché i llavors","mc0i2":"Brioix de la casa amb crema de cacau, plàtan i maduixes","mc0i3":"Croissant artesà amb café amb llet","mc0i4":"Esmorzar «El Casino»: entrepà, beguda i café","mc1":"Per a compartir","mc1i0":"Taula de formatges i fruites de temporada","mc1i1":"Taula d'embotits ibèrics amb crostons","mc1i2":"Croquetes casolanes de pernil (6 u.)","mc1i3":"Braves del Casino","mc1i4":"Ensaladilla russa amb ventresca","mc2":"Arrossos","mc2n":"Els nostres arrossos s'elaboren al moment (mínim 2 persones). Preu per persona.","mc2i0":"Arròs senyoret amb marisc","mc2i1":"Paella de marisc i carxofa","mc2i2":"Arròs negre amb sépia i allioli","mc2i3":"Fideuà de la costa","mc3":"Del mercat","mc3i0":"Cru de llobarro amb tomaca cherry i cítrics","mc3i1":"Polp a la brasa amb parmentier","mc3i2":"Bacallà confitat sobre samfaina","mc3i3":"Presa ibèrica a la brasa amb creïlla","mc3i4":"Peix del dia a l'esquena amb ceba confitada","mc3i4p":"s/ mercat","mc4":"Dolços & cafés","mc4i0":"Coulant de xocolata amb gelat de vainilla","mc4i1":"Pastís de formatge al forn","mc4i2":"Café d'especialitat","mc4i3":"Cigaló de Baileys","mc5":"Prova","mc5n":"Hola","mc5i0":"Prova plat categoria prova"},"en":{"mc0":"Breakfast & brunch","mc0i0":"Rustic bread toast with tomato and extra-virgin olive oil","mc0i1":"Avocado toast with poached egg and seeds","mc0i2":"House brioche with chocolate cream, banana and strawberries","mc0i3":"Artisan croissant with a café con leche","mc0i4":"«El Casino» brunch: sandwich, drink and coffee","mc1":"To share","mc1i0":"Cheese board with seasonal fruit","mc1i1":"Iberian charcuterie board with breadsticks","mc1i2":"Homemade ham croquettes (6 pcs)","mc1i3":"Casino-style patatas bravas","mc1i4":"Russian salad with tuna belly","mc2":"Rice dishes","mc2n":"Our rice dishes are cooked to order (min. 2 people). Price per person.","mc2i0":"«Senyoret» seafood rice","mc2i1":"Seafood and artichoke paella","mc2i2":"Black rice with cuttlefish and aioli","mc2i3":"Coastal fideuà (noodle paella)","mc3":"From the market","mc3i0":"Sea bass crudo with cherry tomato and citrus","mc3i1":"Grilled octopus with potato parmentier","mc3i2":"Confit cod over pisto ratatouille","mc3i3":"Grilled Iberian pork with potatoes","mc3i4":"Catch of the day with caramelised onion","mc3i4p":"market price","mc4":"Sweets & coffee","mc4i0":"Chocolate coulant with vanilla ice cream","mc4i1":"Baked cheesecake","mc4i2":"Specialty coffee","mc4i3":"Baileys carajillo","mc5":"Test","mc5n":"Hola","mc5i0":"Test plate category test"}};
   </script>
   <script src="assets/js/i18n.js?v=2" defer></script>
   <script src="assets/js/main.js?v=2" defer></script>
