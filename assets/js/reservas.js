@@ -29,6 +29,7 @@
     fuera_de_horario:  'Esa hora ya no está disponible. Elige otra, por favor.',
     fecha_bloqueada:   'Ese día no admitimos reservas. Prueba con otro.',
     sin_aforo:         'Se acaban de ocupar las últimas mesas de esa hora. Elige otra.',
+    tope_cocina:       'Esa hora se acaba de completar. Prueba un cuarto de hora antes o después.',
     red:               'No hemos podido conectar. Revisa tu conexión e inténtalo otra vez.'
   };
 
@@ -175,9 +176,26 @@
      es información interna y no sale de la casa. */
   function cargarDiasCerrados() {
     if (!configurado) return;
-    api('/rest/v1/bloqueos_publicos?select=fecha&hora_inicio=is.null&fecha=gte.' + iso(hoy()))
+    // Sin filtro de fecha en la consulta: un cierre que empezó la semana pasada
+    // puede seguir vigente hoy si es un periodo de vacaciones. Se filtra aquí,
+    // que son cuatro filas.
+    api('/rest/v1/bloqueos_publicos?select=fecha,fecha_fin&hora_inicio=is.null&order=fecha.asc&limit=200')
       .then(function (filas) {
-        st.diasCerrados = filas.map(function (b) { return b.fecha; });
+        var desdeHoy = iso(hoy());
+        var dias = [];
+        filas.forEach(function (b) {
+          var hasta = b.fecha_fin || b.fecha;
+          if (hasta < desdeHoy) return;            // cierre ya pasado
+          // El periodo se despliega en días sueltos para pintarlos en el calendario
+          var d = new Date(b.fecha + 'T12:00:00');
+          for (var i = 0; i < 400; i++) {          // tope de seguridad
+            var s = iso(d);
+            if (s > hasta) break;
+            if (s >= desdeHoy) dias.push(s);
+            d.setDate(d.getDate() + 1);
+          }
+        });
+        st.diasCerrados = dias;
         if (st.paso === 2) pintarCalendario();
       })
       .catch(function () { st.diasCerrados = []; });

@@ -392,7 +392,8 @@
     nombre_invalido:   'Escribe al menos el nombre.',
     telefono_invalido: 'El teléfono necesita 9 cifras como mínimo.',
     email_invalido:    'Ese correo no parece válido. Puedes dejarlo vacío.',
-    personas_invalido: 'El número de comensales tiene que estar entre 1 y 30.'
+    personas_invalido: 'El número de comensales tiene que estar entre 1 y 30.',
+    tope_cocina:       'Ese cuarto de hora ya está al tope de cocina.'
   };
 
   function alternarNueva() {
@@ -615,15 +616,20 @@
       '  <h2>' + (ed ? 'Corregir este cierre' : 'Cerrar un día o un tramo') + '</h2>' +
       '  <p class="pa-caja__ayuda">' + (ed
            ? 'Cambia lo que haga falta y guarda. Si prefieres dejarlo como estaba, pulsa Descartar.'
-           : 'Úsalo para vacaciones, festivos o un privado. Si dejas las horas en blanco se cierra el día entero.') +
+           : 'Para vacaciones, festivos o un privado. Deja el último día en blanco si solo cierras ' +
+             'uno, y las horas en blanco si cierras el día entero.') +
       '  </p>' +
       '  <div id="paBloqErr"></div>' +
       '  <div class="pa-fila">' +
-      '    <div class="pa-campo"><label for="pbFecha">Día</label>' +
+      '    <div class="pa-campo"><label for="pbFecha">Primer día</label>' +
       '      <input type="date" id="pbFecha" min="' + hoyISO() + '"' + v(ed && ed.fecha) + ' /></div>' +
-      '    <div class="pa-campo"><label for="pbIni">Desde (opcional)</label>' +
+      '    <div class="pa-campo"><label for="pbFechaFin">Último día (opcional)</label>' +
+      '      <input type="date" id="pbFechaFin" min="' + hoyISO() + '"' + v(ed && ed.fecha_fin) + ' /></div>' +
+      '  </div>' +
+      '  <div class="pa-fila">' +
+      '    <div class="pa-campo"><label for="pbIni">Desde la hora (opcional)</label>' +
       '      <input type="time" id="pbIni"' + v(ed && ed.hora_inicio && hhmm(ed.hora_inicio)) + ' /></div>' +
-      '    <div class="pa-campo"><label for="pbFin">Hasta (opcional)</label>' +
+      '    <div class="pa-campo"><label for="pbFin">Hasta la hora (opcional)</label>' +
       '      <input type="time" id="pbFin"' + v(ed && ed.hora_fin && hhmm(ed.hora_fin)) + ' /></div>' +
       '  </div>' +
       '  <div class="pa-campo"><label for="pbMotivo">Motivo (solo lo veis vosotros)</label>' +
@@ -657,23 +663,33 @@
 
   function cargarBloqueos() {
     cargando('#paBloqLista');
-    pet('/rest/v1/bloqueos?select=*&fecha=gte.' + hoyISO() + '&order=fecha.asc')
-      .then(function (l) {
-        bloqueosCargados = l || [];
-        if (!l || !l.length) {
+    // Sin filtro por fecha en la consulta: unas vacaciones que empezaron la
+    // semana pasada siguen vigentes hoy. Se filtra aquí, que son pocas filas.
+    pet('/rest/v1/bloqueos?select=*&order=fecha.asc&limit=200')
+      .then(function (todas) {
+        var hoy = hoyISO();
+        var l = (todas || []).filter(function (b) {
+          return (b.fecha_fin || b.fecha) >= hoy;
+        });
+        bloqueosCargados = l;
+        if (!l.length) {
           $('#paBloqLista').innerHTML =
             '<div class="pa-vacio"><strong>No hay días cerrados</strong>El local acepta reservas con normalidad.</div>';
           return;
         }
         $('#paBloqLista').innerHTML =
           '<div class="pa-scroll"><table class="pa-tabla"><thead><tr>' +
-          '<th>Día</th><th>Tramo</th><th>Motivo</th><th></th></tr></thead><tbody>' +
+          '<th>Días</th><th>Tramo</th><th>Motivo</th><th></th></tr></thead><tbody>' +
           l.map(function (b) {
             var tramo = b.hora_inicio
               ? esc(hhmm(b.hora_inicio)) + ' – ' + esc(hhmm(b.hora_fin))
               : '<strong>Día entero</strong>';
+            var cuando = (b.fecha_fin && b.fecha_fin !== b.fecha)
+              ? esc(textoFecha(b.fecha)) + '<br /><span style="color:var(--ink-soft)">hasta ' +
+                esc(textoFecha(b.fecha_fin)) + '</span>'
+              : esc(textoFecha(b.fecha));
             return '<tr' + (b.id === bloqueoEditando ? ' style="background:var(--cream-2)"' : '') + '>' +
-                   '<td>' + esc(textoFecha(b.fecha)) + '</td><td>' + tramo + '</td>' +
+                   '<td>' + cuando + '</td><td>' + tramo + '</td>' +
                    '<td>' + esc(b.motivo || '—') + '</td>' +
                    '<td><div class="pa-acciones">' +
                    '<button type="button" class="pa-btn pa-btn--peq pa-btn--gris" data-editar="' +
@@ -696,12 +712,16 @@
   }
 
   function guardarBloqueo() {
-    var fecha  = $('#pbFecha').value;
-    var ini    = $('#pbIni').value;
-    var fin    = $('#pbFin').value;
-    var motivo = $('#pbMotivo').value.trim();
+    var fecha    = $('#pbFecha').value;
+    var fechaFin = $('#pbFechaFin').value;
+    var ini      = $('#pbIni').value;
+    var fin      = $('#pbFin').value;
+    var motivo   = $('#pbMotivo').value.trim();
 
     if (!fecha) { aviso('#paBloqErr', 'mal', 'Elige el día que quieres cerrar.'); return; }
+    if (fechaFin && fechaFin < fecha) {
+      aviso('#paBloqErr', 'mal', 'El último día no puede ser anterior al primero.'); return;
+    }
     if ((ini && !fin) || (!ini && fin)) {
       aviso('#paBloqErr', 'mal', 'Si cierras solo un tramo, pon la hora de inicio y la de fin.'); return;
     }
@@ -716,12 +736,18 @@
 
     pet(editando ? '/rest/v1/bloqueos?id=eq.' + encodeURIComponent(editando) : '/rest/v1/bloqueos', {
       metodo: editando ? 'PATCH' : 'POST',
-      cuerpo: { fecha: fecha, hora_inicio: ini || null, hora_fin: fin || null, motivo: motivo || null },
+      cuerpo: {
+        fecha: fecha,
+        fecha_fin: (fechaFin && fechaFin !== fecha) ? fechaFin : null,
+        hora_inicio: ini || null,
+        hora_fin: fin || null,
+        motivo: motivo || null
+      },
       prefer: 'return=minimal'
     }).then(function () {
       bloqueoEditando = null;
       vistaBloqueos();   // repinta el formulario vacío y recarga la lista
-      aviso('#paBloqErr', 'ok', editando ? 'Cierre corregido.' : 'Día cerrado. Ya no se aceptan reservas.');
+      aviso('#paBloqErr', 'ok', editando ? 'Cierre corregido.' : 'Listo. Ya no se aceptan reservas esos días.');
     }).catch(function (e) {
       if (e.message === 'sesion_caducada') return;
       b.disabled = false; b.textContent = textoOriginal;
@@ -751,8 +777,13 @@
       '<div class="pa-caja">' +
       '  <h2>Horario de reservas y aforo</h2>' +
       '  <p class="pa-caja__ayuda">Esto no es el horario de apertura del bar, sino las horas en las que ' +
-      '     la web acepta reservas de mesa. <strong>Aforo</strong> es cuánta gente cabe a la vez; ' +
-      '     <strong>turno</strong>, cuánto tiempo se le reserva la mesa a cada cliente.</p>' +
+      '     la web acepta reservas. Están los catorce turnos de la semana: desmarca <strong>Abierto</strong> ' +
+      '     en los que no uses y márcalo el día que abras por una fiesta.</p>' +
+      '  <p class="pa-caja__ayuda"><strong>Aforo</strong> es cuánta gente cabe sentada a la vez. ' +
+      '     <strong>Turno</strong>, cuánto tiempo se le guarda la mesa a cada cliente. ' +
+      '     <strong>Máx. por tramo</strong> es cuántos comensales pueden entrar en cada cuarto de hora: ' +
+      '     lo que evita que la cocina reciba cuarenta primeros a las nueve en punto. Déjalo en blanco ' +
+      '     si no quieres ese tope.</p>' +
       '  <div id="paHorErr"></div>' +
       '  <div id="paHorLista"></div>' +
       '</div>';
@@ -770,17 +801,24 @@
         });
         $('#paHorLista').innerHTML =
           '<div class="pa-scroll"><table class="pa-tabla"><thead><tr>' +
-          '<th>Día</th><th>Servicio</th><th>Horas</th><th>Aforo</th><th>Turno (min)</th><th>Activo</th>' +
+          '<th>Día</th><th>Servicio</th><th>Desde</th><th>Hasta</th>' +
+          '<th>Aforo</th><th>Turno (min)</th><th>Máx. por tramo</th><th>Abierto</th>' +
           '</tr></thead><tbody>' +
           l.map(function (f) {
             return '<tr' + (f.activa ? '' : ' class="es-inactiva"') + ' data-f="' + esc(f.id) + '">' +
               '<td>' + DIAS[f.dia_semana] + '</td>' +
               '<td>' + esc(f.servicio) + '</td>' +
-              '<td>' + esc(hhmm(f.hora_inicio)) + ' – ' + esc(hhmm(f.hora_fin)) + '</td>' +
+              '<td><input type="time" value="' + esc(hhmm(f.hora_inicio)) +
+                  '" data-c="hora_inicio" aria-label="Primera hora" /></td>' +
+              '<td><input type="time" value="' + esc(hhmm(f.hora_fin)) +
+                  '" data-c="hora_fin" aria-label="Última hora" /></td>' +
               '<td><input type="number" min="1" max="500" value="' + f.aforo_maximo +
                   '" data-c="aforo_maximo" aria-label="Aforo" /></td>' +
               '<td><input type="number" min="15" max="480" step="15" value="' + f.duracion_min +
                   '" data-c="duracion_min" aria-label="Turno en minutos" /></td>' +
+              '<td><input type="number" min="1" max="500" value="' +
+                  (f.max_por_slot == null ? '' : f.max_por_slot) +
+                  '" data-c="max_por_slot" placeholder="sin tope" aria-label="Máximo de comensales por tramo" /></td>' +
               '<td><input type="checkbox" data-c="activa"' + (f.activa ? ' checked' : '') +
                   ' aria-label="Acepta reservas" /></td>' +
               '</tr>';
@@ -802,7 +840,11 @@
     var envios = $$('#paHorLista tbody tr').map(function (tr) {
       var cambios = {};
       $$('[data-c]', tr).forEach(function (i) {
-        cambios[i.dataset.c] = i.type === 'checkbox' ? i.checked : parseInt(i.value, 10);
+        if (i.type === 'checkbox') { cambios[i.dataset.c] = i.checked; return; }
+        if (i.type === 'time')     { cambios[i.dataset.c] = i.value; return; }
+        // Un número en blanco significa "sin tope", no cero
+        var n = parseInt(i.value, 10);
+        cambios[i.dataset.c] = isNaN(n) ? null : n;
       });
       return pet('/rest/v1/franjas_horario?id=eq.' + encodeURIComponent(tr.dataset.f), {
         metodo: 'PATCH', cuerpo: cambios, prefer: 'return=minimal'

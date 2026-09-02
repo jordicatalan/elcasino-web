@@ -16,19 +16,45 @@ create table if not exists public.franjas_horario (
   hora_fin      time not null,   -- hora de la ÚLTIMA entrada admitida
   aforo_maximo  int  not null check (aforo_maximo > 0),            -- comensales simultáneos
   duracion_min  int  not null default 90 check (duracion_min > 0), -- cuánto ocupa una mesa
+  -- Tope de cocina: cuánta gente puede ENTRAR en cada tramo. Es distinto del
+  -- aforo, que cuenta a los que están sentados. Sin esto, cuarenta comensales
+  -- pueden reservar todos a las 21:00 y la cocina revienta.
+  max_por_slot  int,             -- null = sin tope
   activa        boolean not null default true,
   constraint franja_coherente check (hora_fin >= hora_inicio)
 );
 
--- Cierres puntuales: días completos o tramos sueltos
+-- Aparte del create, para poder reejecutar sobre instalaciones anteriores.
+alter table public.franjas_horario add column if not exists max_por_slot int;
+
+alter table public.franjas_horario drop constraint if exists franja_tope_positivo;
+alter table public.franjas_horario add  constraint franja_tope_positivo
+  check (max_por_slot is null or max_por_slot > 0);
+
+-- Un solo turno por día y servicio, para que la tabla del panel sea estable
+create unique index if not exists idx_franja_dia_servicio
+  on public.franjas_horario (dia_semana, servicio);
+
+-- Cierres puntuales: un día suelto, un tramo de horas, o un periodo entero
+-- de vacaciones. fecha_fin nula = solo el día de "fecha", que es como
+-- funcionaba antes, así que las filas antiguas siguen valiendo.
 create table if not exists public.bloqueos (
   id          uuid primary key default gen_random_uuid(),
   fecha       date not null,
-  hora_inicio time,          -- null = día entero bloqueado
+  fecha_fin   date,          -- null = solo ese día
+  hora_inicio time,          -- null = el día (o el periodo) entero
   hora_fin    time,
   motivo      text,
   creado_en   timestamptz not null default now()
 );
+
+-- Aparte del create, para que el esquema se pueda reejecutar sobre
+-- instalaciones anteriores donde la tabla ya existía sin esta columna.
+alter table public.bloqueos add column if not exists fecha_fin date;
+
+alter table public.bloqueos drop constraint if exists bloqueo_periodo_coherente;
+alter table public.bloqueos add  constraint bloqueo_periodo_coherente
+  check (fecha_fin is null or fecha_fin >= fecha);
 
 create table if not exists public.reservas (
   id           uuid primary key default gen_random_uuid(),
@@ -140,7 +166,7 @@ security definer
 set search_path = public
 as $func$
 declare
-  v_slot       int := coalesce((select valor::int from config where clave = 'slot_min'), 30);
+  v_slot       int := coalesce((select valor::int from config where clave = 'slot_min'), 15);
   -- En minutos, no en horas: así se puede permitir reservar para dentro de media
   -- hora, que es lo normal en un bar donde la gente decide sobre la marcha.
   v_antelacion int := coalesce((select valor::int from config where clave = 'antelacion_min_minutos'), 30);
@@ -151,8 +177,12 @@ begin
     return;
   end if;
 
-  -- Día entero bloqueado
-  if exists (select 1 from bloqueos b where b.fecha = p_fecha and b.hora_inicio is null) then
+  -- Día entero cerrado, ya sea un día suelto o dentro de un periodo de vacaciones
+  if exists (
+    select 1 from bloqueos b
+    where p_fecha between b.fecha and coalesce(b.fecha_fin, b.fecha)
+      and b.hora_inicio is null
+  ) then
     return;
   end if;
 
@@ -160,6 +190,7 @@ begin
   with slots as (
     select f.aforo_maximo,
            f.duracion_min,
+           f.max_por_slot,
            generate_series(
              (p_fecha + f.hora_inicio)::timestamp,
              (p_fecha + f.hora_fin)::timestamp,
@@ -172,24 +203,27 @@ begin
   validos as (
     select s.aforo_maximo,
            s.duracion_min,
+           s.max_por_slot,
            s.inicio,
            s.inicio + make_interval(mins => s.duracion_min) as fin
     from slots s
     -- Respeta la antelación mínima (hora española)
     where (s.inicio at time zone 'Europe/Madrid') >= now() + make_interval(mins => v_antelacion)
-      -- Descarta tramos bloqueados puntualmente
+      -- Descarta tramos cerrados puntualmente, también dentro de un periodo
       and not exists (
         select 1 from bloqueos b
-        where b.fecha = p_fecha
+        where p_fecha between b.fecha and coalesce(b.fecha_fin, b.fecha)
           and b.hora_inicio is not null
           and s.inicio < (p_fecha + b.hora_fin)
           and (s.inicio + make_interval(mins => s.duracion_min)) > (p_fecha + b.hora_inicio)
       )
   ),
+  -- LÍMITE 1 · SALA: cuánta gente está SENTADA a esa hora
   ocupacion as (
     select v.inicio,
            v.aforo_maximo,
-           coalesce(sum(r.num_personas), 0)::int as ocupadas
+           v.max_por_slot,
+           coalesce(sum(r.num_personas), 0)::int as sentadas
     from validos v
     left join reservas r
       on  r.fecha  = p_fecha
@@ -199,13 +233,37 @@ begin
       -- 22:00 + 120 min da 00:00, que como hora suelta es el principio del día.
       and (p_fecha + r.hora) < v.fin
       and (p_fecha + r.hora + make_interval(mins => v.duracion_min)) > v.inicio
-    group by v.inicio, v.aforo_maximo
+    group by v.inicio, v.aforo_maximo, v.max_por_slot
+  ),
+  -- LÍMITE 2 · COCINA: cuánta gente ENTRA en ese tramo concreto.
+  -- Es lo que evita que cuarenta comensales reserven todos a las 21:00
+  -- y a la cocina le entren cuarenta primeros a la vez.
+  llegadas as (
+    select v.inicio,
+           coalesce(sum(r.num_personas), 0)::int as entran
+    from validos v
+    left join reservas r
+      on  r.fecha  = p_fecha
+      and r.estado = 'confirmada'
+      and (p_fecha + r.hora) >= v.inicio
+      and (p_fecha + r.hora) <  v.inicio + make_interval(mins => v_slot)
+    group by v.inicio
+  ),
+  -- Manda el más estrecho de los dos. Sin tope de cocina, solo cuenta la sala.
+  disponible as (
+    select o.inicio,
+           least(
+             greatest(o.aforo_maximo - o.sentadas, 0),
+             coalesce(o.max_por_slot - l.entran, 2147483647)
+           ) as libres
+    from ocupacion o
+    join llegadas l on l.inicio = o.inicio
   )
-  select to_char(o.inicio, 'HH24:MI')::text,
-         greatest(o.aforo_maximo - o.ocupadas, 0)::int,
-         ((o.aforo_maximo - o.ocupadas) < p_personas)
-  from ocupacion o
-  order by o.inicio;
+  select to_char(d.inicio, 'HH24:MI')::text,
+         greatest(d.libres, 0)::int,
+         (d.libres < p_personas)
+  from disponible d
+  order by d.inicio;
 end;
 $func$;
 
@@ -230,6 +288,8 @@ as $func$
 declare
   v_franja   record;
   v_ocupadas int;
+  v_entran   int;
+  v_slot     int := coalesce((select valor::int from config where clave = 'slot_min'), 15);
   v_id       uuid;
 begin
   -- Validación en servidor: nunca fiarse solo del navegador
@@ -266,9 +326,10 @@ begin
     return jsonb_build_object('ok', false, 'error', 'fuera_de_horario');
   end if;
 
+  -- Cierres: un día suelto o cualquier día dentro de un periodo de vacaciones
   if exists (
     select 1 from bloqueos b
-    where b.fecha = p_fecha
+    where p_fecha between b.fecha and coalesce(b.fecha_fin, b.fecha)
       and (b.hora_inicio is null
            or ((p_fecha + p_hora) < (p_fecha + b.hora_fin)
                and (p_fecha + p_hora + make_interval(mins => v_franja.duracion_min))
@@ -289,6 +350,22 @@ begin
   if v_ocupadas + p_personas > v_franja.aforo_maximo then
     return jsonb_build_object('ok', false, 'error', 'sin_aforo',
                               'libres', greatest(v_franja.aforo_maximo - v_ocupadas, 0));
+  end if;
+
+  -- Segundo límite: la cocina. Cuenta solo a los que ENTRAN en este mismo
+  -- tramo, no a los que ya están sentados de antes.
+  if v_franja.max_por_slot is not null then
+    select coalesce(sum(r.num_personas), 0)::int into v_entran
+    from reservas r
+    where r.fecha = p_fecha
+      and r.estado = 'confirmada'
+      and (p_fecha + r.hora) >= (p_fecha + p_hora)
+      and (p_fecha + r.hora) <  (p_fecha + p_hora + make_interval(mins => v_slot));
+
+    if v_entran + p_personas > v_franja.max_por_slot then
+      return jsonb_build_object('ok', false, 'error', 'tope_cocina',
+                                'libres', greatest(v_franja.max_por_slot - v_entran, 0));
+    end if;
   end if;
 
   insert into reservas (nombre, telefono, email, num_personas, fecha, hora, notas)
@@ -344,6 +421,8 @@ as $func$
 declare
   v_franja   record;
   v_ocupadas int;
+  v_entran   int;
+  v_slot     int := coalesce((select valor::int from config where clave = 'slot_min'), 15);
   v_id       uuid;
 begin
   -- Aunque la función esté concedida a cualquier autenticado, solo actúa
@@ -396,6 +475,23 @@ begin
     if v_ocupadas + p_personas > v_franja.aforo_maximo and not p_forzar then
       return jsonb_build_object('ok', false, 'error', 'sin_aforo',
                                 'libres', greatest(v_franja.aforo_maximo - v_ocupadas, 0));
+    end if;
+
+    -- El tope de cocina también avisa aquí: las reservas de teléfono son la
+    -- mayoría, y si estas se lo saltan sin más, el escalonado no sirve de nada.
+    -- Se puede forzar igual, que para eso decide el personal.
+    if v_franja.max_por_slot is not null and not p_forzar then
+      select coalesce(sum(r.num_personas), 0)::int into v_entran
+      from reservas r
+      where r.fecha = p_fecha
+        and r.estado = 'confirmada'
+        and (p_fecha + r.hora) >= (p_fecha + p_hora)
+        and (p_fecha + r.hora) <  (p_fecha + p_hora + make_interval(mins => v_slot));
+
+      if v_entran + p_personas > v_franja.max_por_slot then
+        return jsonb_build_object('ok', false, 'error', 'tope_cocina',
+                                  'libres', greatest(v_franja.max_por_slot - v_entran, 0));
+      end if;
     end if;
   end if;
 
@@ -509,7 +605,8 @@ set search_path = public
 as $func$
 begin
   if exists (select 1 from bloqueos b
-             where b.fecha = p_fecha and b.hora_inicio is null) then
+             where p_fecha between b.fecha and coalesce(b.fecha_fin, b.fecha)
+               and b.hora_inicio is null) then
     return 'cerrado_puntual';        -- vacaciones, festivo, un privado
   end if;
 
@@ -534,8 +631,11 @@ drop policy if exists "todos leen bloqueos" on public.bloqueos;
 
 -- Vista con lo justo para pintar el calendario. Al no llevar security_invoker,
 -- se ejecuta con permisos del propietario y no expone la tabla de debajo.
-create or replace view public.bloqueos_publicos as
-  select fecha, hora_inicio, hora_fin from public.bloqueos;
+-- Se recrea porque ahora incluye fecha_fin, y una vista no admite
+-- añadir columnas con create or replace.
+drop view if exists public.bloqueos_publicos;
+create view public.bloqueos_publicos as
+  select fecha, fecha_fin, hora_inicio, hora_fin from public.bloqueos;
 
 grant select on public.bloqueos_publicos to anon, authenticated;
 
@@ -602,7 +702,7 @@ create trigger tr_avisar_correo
 
 -- ---------- 9. DATOS INICIALES ----------
 insert into public.config (clave, valor) values
-  ('slot_min',             '30'),
+  ('slot_min',             '15'),   -- tramos de cuarto de hora
   ('antelacion_min_minutos', '30'),
   ('dias_max_vista',       '60'),
   ('nombre_negocio',       'El Casino Vila-real'),
@@ -628,3 +728,32 @@ select * from (values
   (6, 'cena',   time '20:00', time '23:00', 40, 120)
 ) as v(dia_semana, servicio, hora_inicio, hora_fin, aforo_maximo, duracion_min)
 where not exists (select 1 from public.franjas_horario);
+
+-- Los 14 turnos de la semana (7 días × comidas y cenas) siempre presentes,
+-- los que faltaban desactivados. Así el panel enseña la semana completa y el
+-- negocio puede abrir un lunes de fiesta mayor sin llamar a nadie.
+insert into public.franjas_horario
+  (dia_semana, servicio, hora_inicio, hora_fin, aforo_maximo, duracion_min, activa)
+select d.dia,
+       s.servicio,
+       case when s.servicio = 'comida' then time '13:00' else time '20:00' end,
+       case when s.servicio = 'comida' then time '15:30' else time '23:00' end,
+       40,
+       case when s.servicio = 'comida' then 90 else 120 end,
+       false
+from generate_series(0, 6) as d(dia)
+cross join (values ('comida'), ('cena')) as s(servicio)
+on conflict (dia_semana, servicio) do nothing;
+
+-- Valor de partida para el tope de cocina. Solo la primera vez: si el negocio
+-- ya ha tocado alguno, no se pisa nada. El número real lo ajustan ellos viendo
+-- cuántos primeros aguanta la cocina por cuarto de hora.
+update public.franjas_horario set max_por_slot = 8
+where max_por_slot is null
+  and not exists (select 1 from public.franjas_horario where max_por_slot is not null);
+
+-- Los datos iniciales de arriba no pisan lo que ya existe, así que en las
+-- instalaciones antiguas slot_min se quedaría en los 30 minutos originales.
+-- Solo se cambia si sigue teniendo ese valor de fábrica: si el negocio lo ha
+-- puesto a otra cosa a propósito, se respeta.
+update public.config set valor = '15' where clave = 'slot_min' and valor = '30';
