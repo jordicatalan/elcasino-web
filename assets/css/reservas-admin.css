@@ -368,3 +368,32 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; line-height
   .pa-acciones .pa-btn { width: 100%; }
 }
 
+
+/* ---------- Campos de fecha y hora en iOS ----------
+   Safari los pinta a su manera: el valor va centrado dentro de la caja y,
+   cuando esta vacio, su zona interna no tiene altura, asi que el campo se
+   descuadra respecto a los de texto. Estas reglas los igualan. */
+.pa-campo input[type="date"],
+.pa-campo input[type="time"],
+.pa-tabla input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 3rem;
+  line-height: 1.25;
+}
+.pa-tabla input[type="time"] { min-height: 2.4rem; }
+
+/* La parte que dibuja el valor: alineada a la izquierda como el resto de
+   campos, y con altura aunque no haya nada escrito */
+.pa-campo input[type="date"]::-webkit-date-and-time-value,
+.pa-campo input[type="time"]::-webkit-date-and-time-value,
+.pa-tabla input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.25em;
+}
+
+/* Sin esto el icono del calendario se pega al borde en pantallas estrechas */
+.pa-campo input[type="date"]::-webkit-calendar-picker-indicator,
+.pa-campo input[type="time"]::-webkit-calendar-picker-indicator {
+  margin-left: .3rem;
+}
