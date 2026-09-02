@@ -67,8 +67,14 @@ create table if not exists public.reservas (
   notas        text,
   estado       text not null default 'confirmada' check (estado in ('confirmada','cancelada')),
   creado_en    timestamptz not null default now(),
-  cancelada_en timestamptz
+  cancelada_en timestamptz,
+  -- Cuándo se mandó el recordatorio de la víspera. Nula = aún no se ha
+  -- mandado. Es lo que impide avisar dos veces si la tarea se repite.
+  recordatorio_en timestamptz
 );
+
+-- Aparte del create, para poder reejecutar sobre instalaciones anteriores.
+alter table public.reservas add column if not exists recordatorio_en timestamptz;
 
 -- Ajustes generales, editables sin tocar código
 create table if not exists public.config (
@@ -698,6 +704,80 @@ drop trigger if exists tr_avisar_correo on public.reservas;
 create trigger tr_avisar_correo
   after insert or update of estado on public.reservas
   for each row execute function public.avisar_por_correo();
+
+
+-- ---------- 8-bis. RECORDATORIO DE LA VÍSPERA ----------
+-- Un aviso a las 20:00 del día antes, con el enlace para cancelar. Es lo que
+-- más reduce los plantones: quien ya no puede venir avisa desde el correo y
+-- la mesa se libera sola.
+--
+-- La tarea se lanza CADA HORA y es la función la que mira si en España son
+-- las ocho. Con una hora fija en UTC, el cambio de horario de marzo y octubre
+-- desplazaría los correos una hora dos veces al año.
+create extension if not exists pg_cron;
+
+create or replace function public.enviar_recordatorios()
+returns int
+language plpgsql
+security definer
+set search_path = public
+as $func$
+declare
+  v_url    text := nullif((select valor from config where clave = 'url_funcion_correo'), '');
+  v_clave  text := coalesce((select valor from config where clave = 'clave_api_correo'), '');
+  v_manana date;
+  r        record;
+  v_n      int := 0;
+begin
+  if v_url is null then
+    return 0;                       -- sin correo configurado, no hay nada que hacer
+  end if;
+
+  if extract(hour from (now() at time zone 'Europe/Madrid'))::int <> 20 then
+    return 0;                       -- a cualquier otra hora no toca
+  end if;
+
+  v_manana := ((now() at time zone 'Europe/Madrid')::date + 1);
+
+  for r in
+    select id from reservas
+    where estado = 'confirmada'
+      and email is not null
+      and recordatorio_en is null   -- a cada reserva se le avisa una sola vez
+      and fecha = v_manana
+    order by hora
+  loop
+    -- Se marca ANTES de pedir el envío: si algo falla luego, el cliente se
+    -- queda sin recordatorio, que es mucho menos molesto que recibir seis.
+    update reservas set recordatorio_en = now() where id = r.id;
+
+    perform net.http_post(
+      url     := v_url,
+      headers := jsonb_build_object(
+                   'Content-Type',  'application/json',
+                   'apikey',        v_clave,
+                   'Authorization', 'Bearer ' || v_clave
+                 ),
+      body    := jsonb_build_object('tipo', 'recordatorio', 'id', r.id)
+    );
+    v_n := v_n + 1;
+  end loop;
+
+  return v_n;
+end;
+$func$;
+
+revoke all on function public.enviar_recordatorios() from public;
+
+-- La tarea programada. Se borra antes por si ya existía de una ejecución previa.
+select cron.unschedule('recordatorios-reserva')
+where exists (select 1 from cron.job where jobname = 'recordatorios-reserva');
+
+select cron.schedule(
+  'recordatorios-reserva',
+  '5 * * * *',                      -- cada hora, en el minuto 5
+  $tarea$ select public.enviar_recordatorios(); $tarea$
+);
 
 
 -- ---------- 9. DATOS INICIALES ----------

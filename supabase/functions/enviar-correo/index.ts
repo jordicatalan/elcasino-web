@@ -1,9 +1,10 @@
 // ============================================================
 // EL CASINO — Envío de correos de reserva
 //
-// La llama el disparador de la base de datos, no el navegador:
-//   - al crear una reserva    -> confirmación al cliente + aviso al negocio
-//   - al pasar a "cancelada"  -> aviso de cancelación a ambos
+// La llama la base de datos, no el navegador:
+//   - al crear una reserva     -> confirmación al cliente + aviso al negocio
+//   - al pasar a "cancelada"   -> aviso de cancelación a ambos
+//   - a las 20:00 de la víspera -> recordatorio al cliente, solo a él
 //
 // Da igual quién cancele (el cliente desde el enlace, el personal desde
 // el panel, o alguien desde Supabase): el correo sale siempre, porque
@@ -40,6 +41,7 @@ interface Reserva {
   estado: string;
   creado_en: string;
   cancelada_en: string | null;
+  recordatorio_en: string | null;
   token_cancelacion: string;
 }
 
@@ -129,10 +131,56 @@ function detalles(r: Reserva): string {
   </table>`;
 }
 
-function correoNueva(r: Reserva): { asunto: string; html: string } {
-  const enlace = ENV.sitio
+function enlaceCancelar(r: Reserva): string {
+  return ENV.sitio
     ? `${ENV.sitio}/cancelar.html?id=${r.id}&t=${r.token_cancelacion}`
     : "";
+}
+
+function botonCancelar(enlace: string, texto: string): string {
+  if (!enlace) return "";
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+      <tr><td style="border-radius:999px;background:#a8480c;">
+        <a href="${esc(enlace)}"
+           style="display:inline-block;padding:13px 28px;font-size:13px;font-weight:bold;
+                  letter-spacing:.08em;text-transform:uppercase;color:#ffffff;text-decoration:none;">
+          ${esc(texto)}</a>
+      </td></tr>
+    </table>`;
+}
+
+// Aviso de la víspera. Quien ya no puede venir avisa desde aquí y la mesa
+// se libera sola, que es lo que de verdad reduce los plantones.
+function correoRecordatorio(r: Reserva): { asunto: string; html: string } {
+  const enlace = enlaceCancelar(r);
+
+  const cuerpo = `<tr><td style="padding:30px;">
+    <h1 style="font-family:Georgia,serif;font-size:23px;color:#241608;margin:0 0 10px;">
+      Mañana te esperamos</h1>
+    <p style="font-size:15px;line-height:1.7;color:#6b5844;margin:0;">
+      Hola ${esc(r.nombre.split(" ")[0])}, un recordatorio de tu mesa para mañana.</p>
+    ${detalles(r)}
+    ${enlace ? `
+    <p style="font-size:14px;line-height:1.7;color:#6b5844;margin:0 0 14px;">
+      ¿Te ha surgido algo? Cancélala aquí mismo y la mesa queda libre para otros.
+      Mejor eso que dejarla vacía.</p>
+    ${botonCancelar(enlace, "Cancelar mi reserva")}` : ""}
+    <p style="font-size:13px;line-height:1.7;color:#6b5844;margin:22px 0 0;">
+      Si vais a ser más o menos de los apuntados, llámanos al
+      <a href="tel:+34${esc(ENV.telefono)}" style="color:#a8480c;">${esc(ENV.telefono)}</a>
+      y lo ajustamos.</p>
+  </td></tr>`;
+
+  return {
+    asunto: `Mañana en El Casino · ${r.hora.slice(0, 5)}, ${r.num_personas} ` +
+            (r.num_personas === 1 ? "persona" : "personas"),
+    html: envoltorio("Mañana te esperamos", cuerpo),
+  };
+}
+
+function correoNueva(r: Reserva): { asunto: string; html: string } {
+  const enlace = enlaceCancelar(r);
 
   const cuerpo = `<tr><td style="padding:30px;">
     <h1 style="font-family:Georgia,serif;font-size:23px;color:#241608;margin:0 0 10px;">
@@ -143,14 +191,7 @@ function correoNueva(r: Reserva): { asunto: string; html: string } {
     ${enlace ? `
     <p style="font-size:14px;line-height:1.7;color:#6b5844;margin:0 0 14px;">
       ¿No puedes venir al final? Cancélala tú mismo, así la mesa queda libre para otros:</p>
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
-      <tr><td style="border-radius:999px;background:#a8480c;">
-        <a href="${esc(enlace)}"
-           style="display:inline-block;padding:13px 28px;font-size:13px;font-weight:bold;
-                  letter-spacing:.08em;text-transform:uppercase;color:#ffffff;text-decoration:none;">
-          Cancelar mi reserva</a>
-      </td></tr>
-    </table>` : ""}
+    ${botonCancelar(enlace, "Cancelar mi reserva")}` : ""}
     <p style="font-size:13px;line-height:1.7;color:#6b5844;margin:22px 0 0;">
       Si necesitas cambiar la hora o el número de personas, llámanos al
       <a href="tel:+34${esc(ENV.telefono)}" style="color:#a8480c;">${esc(ENV.telefono)}</a>.</p>
@@ -238,7 +279,7 @@ Deno.serve(async (peticion) => {
     return new Response(JSON.stringify({ ok: false, error: "json_invalido" }), { status: 400 });
   }
 
-  if (tipo !== "nueva" && tipo !== "cancelada") {
+  if (tipo !== "nueva" && tipo !== "cancelada" && tipo !== "recordatorio") {
     return new Response(JSON.stringify({ ok: false, error: "tipo_invalido" }), { status: 400 });
   }
   if (!/^[0-9a-f-]{36}$/i.test(id)) {
@@ -262,20 +303,33 @@ Deno.serve(async (peticion) => {
 
   // Solo se avisa de lo que acaba de pasar. Repetir la llamada más tarde
   // con un id ajeno no sirve para reenviar correos.
-  const marca = tipo === "nueva" ? r.creado_en : r.cancelada_en;
+  const marca = tipo === "nueva"        ? r.creado_en
+              : tipo === "cancelada"    ? r.cancelada_en
+              :                           r.recordatorio_en;
   if (!reciente(marca)) {
     return new Response(JSON.stringify({ ok: false, error: "fuera_de_plazo" }), { status: 409 });
   }
   if (tipo === "cancelada" && r.estado !== "cancelada") {
     return new Response(JSON.stringify({ ok: false, error: "estado_no_coincide" }), { status: 409 });
   }
+  // Una reserva cancelada entre medias no debe recibir el recordatorio
+  if (tipo === "recordatorio" && r.estado !== "confirmada") {
+    return new Response(JSON.stringify({ ok: false, error: "ya_no_esta_activa" }), { status: 409 });
+  }
 
-  const alCliente = tipo === "nueva" ? correoNueva(r) : correoCancelada(r);
-  const alNegocio = correoNegocio(r, tipo);
+  const alCliente = tipo === "nueva"     ? correoNueva(r)
+                  : tipo === "cancelada" ? correoCancelada(r)
+                  :                        correoRecordatorio(r);
 
   const envios: Promise<boolean>[] = [];
   if (r.email) envios.push(enviar(r.email, alCliente.asunto, alCliente.html));
-  if (ENV.negocio) envios.push(enviar(ENV.negocio, alNegocio.asunto, alNegocio.html));
+
+  // Al negocio se le avisa de altas y cancelaciones, pero NO de los
+  // recordatorios: un sábado serían treinta correos suyos a las ocho.
+  if (ENV.negocio && tipo !== "recordatorio") {
+    const alNegocio = correoNegocio(r, tipo);
+    envios.push(enviar(ENV.negocio, alNegocio.asunto, alNegocio.html));
+  }
 
   const hechos = await Promise.all(envios);
   return new Response(
