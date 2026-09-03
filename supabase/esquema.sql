@@ -521,6 +521,114 @@ grant execute on function
   public.crear_reserva_personal(text, text, text, int, date, time, text, boolean) to authenticated;
 
 
+-- ---------- 4-ter. CAMBIAR COMENSALES DESDE EL PANEL ----------
+-- El correo de recordatorio dice "si vais a ser más o menos, llámanos y lo
+-- ajustamos". Sin esto esa promesa no se puede cumplir: el panel enseña la
+-- reserva pero no deja tocarla, y el personal acaba cancelando y apuntando
+-- otra, que manda dos correos al cliente y ensucia el listado.
+--
+-- No se hace con un PATCH directo a la tabla porque saltarse el aforo es
+-- justo lo que no puede pasar: subir de 2 a 12 comensales por teléfono llena
+-- la sala sin que la web se entere.
+create or replace function public.editar_reserva(
+  p_id       uuid,
+  p_personas int,
+  p_forzar   boolean default false
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $func$
+declare
+  v_res      record;
+  v_franja   record;
+  v_ocupadas int;
+  v_entran   int;
+  v_slot     int := coalesce((select valor::int from config where clave = 'slot_min'), 15);
+begin
+  if not public.es_personal() then
+    return jsonb_build_object('ok', false, 'error', 'no_autorizado');
+  end if;
+
+  if p_personas is null or p_personas < 1 or p_personas > 30 then
+    return jsonb_build_object('ok', false, 'error', 'personas_invalido');
+  end if;
+
+  select * into v_res from reservas where id = p_id;
+
+  if not found then
+    return jsonb_build_object('ok', false, 'error', 'no_existe');
+  end if;
+
+  -- Una reserva cancelada ya no ocupa sitio; cambiarle los comensales solo
+  -- serviría para confundir el recuento del día.
+  if v_res.estado <> 'confirmada' then
+    return jsonb_build_object('ok', false, 'error', 'cancelada');
+  end if;
+
+  if p_personas = v_res.num_personas then
+    return jsonb_build_object('ok', true, 'antes', v_res.num_personas, 'ahora', p_personas);
+  end if;
+
+  -- Bajar de comensales siempre libera sitio, así que no hay nada que
+  -- comprobar. Comprobarlo sería peor: una reserva metida a la fuerza por
+  -- encima del aforo no podría ni reducirse.
+  if p_personas > v_res.num_personas then
+    perform pg_advisory_xact_lock(hashtextextended(v_res.fecha::text || v_res.hora::text, 0));
+
+    select f.* into v_franja
+    from franjas_horario f
+    where f.activa
+      and f.dia_semana = extract(dow from v_res.fecha)::int
+      and v_res.hora between f.hora_inicio and f.hora_fin
+    limit 1;
+
+    -- Sin franja (una comida privada un lunes, apuntada a la fuerza) no hay
+    -- aforo contra el que comparar, así que se deja pasar sin más.
+    if found and not p_forzar then
+      -- La propia reserva YA está contada en la ocupación. Si no se descuenta,
+      -- pasar de 4 a 5 sumaría 9 y el aforo saltaría sin motivo.
+      select coalesce(sum(r.num_personas), 0)::int into v_ocupadas
+      from reservas r
+      where r.fecha = v_res.fecha
+        and r.estado = 'confirmada'
+        and r.id <> v_res.id
+        and (v_res.fecha + r.hora) < (v_res.fecha + v_res.hora + make_interval(mins => v_franja.duracion_min))
+        and (v_res.fecha + r.hora + make_interval(mins => v_franja.duracion_min)) > (v_res.fecha + v_res.hora);
+
+      if v_ocupadas + p_personas > v_franja.aforo_maximo then
+        return jsonb_build_object('ok', false, 'error', 'sin_aforo',
+                                  'libres', greatest(v_franja.aforo_maximo - v_ocupadas, 0));
+      end if;
+
+      if v_franja.max_por_slot is not null then
+        select coalesce(sum(r.num_personas), 0)::int into v_entran
+        from reservas r
+        where r.fecha = v_res.fecha
+          and r.estado = 'confirmada'
+          and r.id <> v_res.id
+          and (v_res.fecha + r.hora) >= (v_res.fecha + v_res.hora)
+          and (v_res.fecha + r.hora) <  (v_res.fecha + v_res.hora + make_interval(mins => v_slot));
+
+        if v_entran + p_personas > v_franja.max_por_slot then
+          return jsonb_build_object('ok', false, 'error', 'tope_cocina',
+                                    'libres', greatest(v_franja.max_por_slot - v_entran, 0));
+        end if;
+      end if;
+    end if;
+  end if;
+
+  update reservas set num_personas = p_personas where id = p_id;
+
+  return jsonb_build_object('ok', true, 'antes', v_res.num_personas, 'ahora', p_personas);
+end;
+$func$;
+
+revoke all on function public.editar_reserva(uuid, int, boolean) from public;
+grant execute on function public.editar_reserva(uuid, int, boolean) to authenticated;
+
+
 -- ---------- 5. CANCELAR DESDE EL CORREO ----------
 -- Cada reserva lleva un testigo secreto. Quien reciba el enlace del correo
 -- puede cancelar ESA reserva, sin cuenta ni contraseña. Sin el testigo,

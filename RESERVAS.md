@@ -190,7 +190,7 @@ enlazado desde la web a propósito).
 
 | Pestaña | Para qué |
 |---|---|
-| **Reservas** | El servicio del día, partido en Comidas y Cenas, con teléfono para llamar. Cancelar una reserva libera la mesa y avisa al cliente |
+| **Reservas** | El servicio del día, partido en Comidas y Cenas, con teléfono para llamar. Cancelar una reserva libera la mesa y avisa al cliente. **Editar** cambia los comensales cuando el cliente llama para decir que serán más o menos, recalculando el aforo |
 | **Cerrar días** | Vacaciones, festivos o un privado. Día entero o solo un tramo. Se puede editar y reabrir |
 | **Horario y aforo** | Cambiar cuánta gente cabe, cuánto dura el turno, o desactivar un servicio |
 

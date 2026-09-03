@@ -164,6 +164,23 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; line-height
   margin-top: .5rem; padding: .5rem .7rem; background: var(--cream-2);
   border-radius: 8px; font-size: .86rem; color: var(--ink);
 }
+/* Botones de la tarjeta, en columna: "Editar" y "Cancelar" en fila obligarian
+   a estrechar la columna del nombre, que es la que mas se lee. */
+.pa-res__acc { display: flex; flex-direction: column; gap: .4rem; }
+.pa-res__acc .pa-btn { width: 100%; }
+
+/* Tarjeta mientras se cambian los comensales. Bloque, no rejilla: el campo y
+   los botones necesitan el ancho entero. */
+.pa-res--edit { display: block; border-left-color: var(--accent-ink); }
+.pa-res__edcab { margin-bottom: .9rem; font-size: .95rem; color: var(--ink-soft); }
+.pa-res__edcab strong { color: var(--ink); font-size: 1.05rem; }
+.pa-res__edform { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .9rem; }
+.pa-res__edform .pa-campo { margin: 0; width: 7.5rem; flex: 0 0 auto; }
+.pa-res__edbtns { display: flex; gap: .5rem; flex-wrap: wrap; }
+.pa-res__edayuda {
+  margin: .95rem 0 0; font-size: .84rem; color: var(--ink-soft); line-height: 1.55;
+}
+
 .pa-etiq {
   display: inline-block; padding: .18em .6em; border-radius: 999px;
   font-size: .66rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
@@ -216,6 +233,12 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; line-height
   .pa-res { grid-template-columns: 1fr; gap: .5rem; }
   .pa-res__lado { display: flex; align-items: baseline; gap: .6rem; }
   .pa-res__pers { margin: 0; }
+  /* Ya en una sola columna, los dos botones caben de lado a lado */
+  .pa-res__acc { flex-direction: row; margin-top: .3rem; }
+  .pa-res__acc .pa-btn { flex: 1; }
+  .pa-res__edform .pa-campo { width: 100%; }
+  .pa-res__edbtns { width: 100%; }
+  .pa-res__edbtns .pa-btn { flex: 1; }
   .pa-tabs { overflow-x: auto; }
   .pa-tab { white-space: nowrap; }
 }

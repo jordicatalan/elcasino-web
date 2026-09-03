@@ -21,6 +21,8 @@
   var fechaVista = hoyISO();
   var bloqueoEditando  = null;   // id del cierre que se está corrigiendo
   var bloqueosCargados = [];     // último listado, para rellenar el formulario al editar
+  var reservaEditando  = null;   // id de la reserva a la que se le cambian los comensales
+  var reservasCargadas = [];     // el día a la vista, para repintar sin volver a pedirlo
 
   /* ---------- utilidades ---------- */
 
@@ -522,6 +524,9 @@
   }
 
   function cargarReservas() {
+    // Cualquier recarga cierra el formulario de edición: si se ha cambiado de
+    // día, la reserva que se estaba tocando ya no está en pantalla.
+    reservaEditando = null;
     cargando('#paRes');
     pet('/rest/v1/reservas?select=*&fecha=eq.' + fechaVista + '&order=hora.asc,creado_en.asc')
       .then(pintarReservas)
@@ -533,6 +538,7 @@
 
   function pintarReservas(lista) {
     lista = lista || [];
+    reservasCargadas = lista;
     var vivas = lista.filter(function (r) { return r.estado === 'confirmada'; });
     var comensales = vivas.reduce(function (s, r) { return s + r.num_personas; }, 0);
 
@@ -558,6 +564,27 @@
     $$('#paRes [data-cancelar]').forEach(function (b) {
       b.addEventListener('click', function () { cancelar(b.dataset.cancelar, b); });
     });
+
+    // Editar no vuelve a pedir el listado: se repinta con lo que ya está en
+    // memoria, así el formulario aparece al instante.
+    $$('#paRes [data-editar]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        reservaEditando = b.dataset.editar;
+        pintarReservas(reservasCargadas);
+      });
+    });
+    $$('#paRes [data-ed-salir]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        reservaEditando = null;
+        pintarReservas(reservasCargadas);
+      });
+    });
+    $$('#paRes [data-ed-guardar]').forEach(function (b) {
+      b.addEventListener('click', function () { guardarEdicion(b.dataset.edGuardar, false); });
+    });
+
+    var campo = $('#pePersonas');
+    if (campo) { campo.focus(); campo.select(); }
   }
 
   // Un servicio (comidas o cenas) con su encabezado y su recuento propio.
@@ -580,6 +607,8 @@
   }
 
   function tarjeta(r) {
+    if (r.id === reservaEditando) return tarjetaEdicion(r);
+
     var cancelada = r.estado === 'cancelada';
     var tel = String(r.telefono || '').replace(/[^0-9+]/g, '');
     return '' +
@@ -598,10 +627,106 @@
       '    </div>' +
            (r.notas ? '<div class="pa-res__notas">' + esc(r.notas) + '</div>' : '') +
       '  </div>' +
-      '  <div>' + (cancelada ? '' :
+      '  <div class="pa-res__acc">' + (cancelada ? '' :
+           '<button type="button" class="pa-btn pa-btn--peq" data-editar="' +
+           esc(r.id) + '">Editar</button>' +
            '<button type="button" class="pa-btn pa-btn--peq pa-btn--mal" data-cancelar="' +
            esc(r.id) + '">Cancelar</button>') + '</div>' +
       '</article>';
+  }
+
+  /* ---------- cambiar los comensales de una reserva ---------- */
+
+  var ERRORES_EDICION = {
+    no_autorizado:     'Tu cuenta no tiene permiso para cambiar reservas.',
+    personas_invalido: 'El número de comensales tiene que estar entre 1 y 30.',
+    no_existe:         'Esa reserva ya no existe. Recarga el día para verlo al día.',
+    cancelada:         'Esta reserva está cancelada, así que ya no ocupa mesa.'
+  };
+
+  // La tarjeta en modo edición sustituye a la normal. Se pinta como un bloque
+  // y no con la rejilla de tres columnas: el campo y los botones necesitan el
+  // ancho entero para no quedar apretados en el móvil.
+  function tarjetaEdicion(r) {
+    return '' +
+      '<article class="pa-res pa-res--edit">' +
+      '  <div class="pa-res__edcab">' +
+      '    <strong>' + esc(r.nombre) + '</strong> · ' + esc(hhmm(r.hora)) +
+      '  </div>' +
+      '  <div id="peErr"></div>' +
+      '  <div class="pa-res__edform">' +
+      '    <div class="pa-campo">' +
+      '      <label for="pePersonas">Comensales</label>' +
+      '      <input type="number" id="pePersonas" min="1" max="30" inputmode="numeric" ' +
+      '             value="' + r.num_personas + '" />' +
+      '    </div>' +
+      '    <div class="pa-res__edbtns">' +
+      '      <button type="button" class="pa-btn pa-btn--peq" data-ed-guardar="' +
+             esc(r.id) + '">Guardar</button>' +
+      '      <button type="button" class="pa-btn pa-btn--peq pa-btn--gris" ' +
+      '              data-ed-salir="1">Descartar</button>' +
+      '    </div>' +
+      '  </div>' +
+      '  <p class="pa-res__edayuda">Ahora mismo son ' + r.num_personas +
+         (r.num_personas === 1 ? ' persona' : ' personas') +
+         '. Al guardar, el aforo del turno se recalcula solo y la web vuelve a ' +
+         'contar bien las mesas libres. Al cliente no se le manda ningún correo.</p>' +
+      '</article>';
+  }
+
+  function guardarEdicion(id, forzar) {
+    var campo = $('#pePersonas');
+    if (!campo) return;
+
+    var n = parseInt(campo.value, 10);
+    if (!n || n < 1 || n > 30) {
+      aviso('#peErr', 'mal', 'Pon un número de comensales entre 1 y 30.');
+      return;
+    }
+
+    var b = $('#paRes [data-ed-guardar]');
+    b.disabled = true; b.textContent = 'Guardando…';
+
+    pet('/rest/v1/rpc/editar_reserva', {
+      metodo: 'POST',
+      cuerpo: { p_id: id, p_personas: n, p_forzar: !!forzar }
+    })
+      .then(function (res) {
+        b.disabled = false; b.textContent = 'Guardar';
+
+        if (res && res.ok) { cargarReservas(); return; }
+
+        // Igual que al apuntar a mano: el aforo avisa, pero no manda. Si el
+        // personal decide apretar mesas, el panel tiene que dejarle.
+        if (res && res.error === 'sin_aforo') {
+          dialogo({
+            titulo: 'No cabe en ese turno',
+            texto: 'Contando las demás reservas de esa franja, en esta caben como mucho ' +
+                   (res.libres || 0) + '. ¿La subes a ' + n + ' igualmente?',
+            aceptar: 'Sí, cambiarla', cancelar: 'No, dejarlo', peligro: true
+          }).then(function (ok) { if (ok) guardarEdicion(id, true); });
+          return;
+        }
+        if (res && res.error === 'tope_cocina') {
+          dialogo({
+            titulo: 'Ese cuarto de hora se pasa de cocina',
+            texto: 'A esa hora entran ya casi todos los que aguanta la cocina: en esta ' +
+                   'reserva caben como mucho ' + (res.libres || 0) + '. ¿La subes a ' +
+                   n + ' igualmente?',
+            aceptar: 'Sí, cambiarla', cancelar: 'No, dejarlo', peligro: true
+          }).then(function (ok) { if (ok) guardarEdicion(id, true); });
+          return;
+        }
+
+        aviso('#peErr', 'mal',
+              ERRORES_EDICION[res && res.error] || 'No se ha podido guardar el cambio.');
+      })
+      .catch(function (e) {
+        b.disabled = false; b.textContent = 'Guardar';
+        if (e.message !== 'sesion_caducada') {
+          aviso('#peErr', 'mal', 'No se ha podido conectar. Inténtalo otra vez.');
+        }
+      });
   }
 
   function cancelar(id, boton) {
